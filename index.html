@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>怪物地圖篩選器 (含黑暗模式)</title>
+    <title>怪物地圖篩選器 </title>
     <style>
         /* --- 1. 定義顏色變數 --- */
         :root {
@@ -57,9 +57,67 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px 15px;
+            /* 修改：為固定導覽列增加頂部空間 */
+            padding: 85px 15px 20px;
             transition: background-color 0.3s, color 0.3s;
         }
+
+        /* --- 新增：固定導覽列樣式 --- */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--container-bg);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            z-index: 1000;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px; /* 配合 main .container 的 padding */
+        }
+
+        .nav-logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--header-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .top-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 25px;
+        }
+
+        .top-nav li a {
+            text-decoration: none;
+            color: var(--interactive-text-color);
+            font-weight: 500;
+            padding-bottom: 5px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .top-nav li a:hover {
+            color: var(--header-color);
+        }
+
+        .top-nav li a.active {
+            color: var(--header-color);
+            border-bottom-color: var(--active-bg);
+        }
+        /* --- 結束新增樣式 --- */
+
         .container {
             position: relative;
             max-width: 800px;
@@ -189,7 +247,23 @@
         }
         
         @media (max-width: 768px) {
-            body { padding: 10px 5px; }
+            body { 
+                /* 調整手機版 body padding */
+                padding: 75px 5px 10px; 
+            }
+            .nav-container {
+                padding: 10px 15px;
+            }
+            .top-nav ul {
+                gap: 15px;
+            }
+            .nav-logo {
+                font-size: 1.2em;
+            }
+            .top-nav li a {
+                font-size: 0.9em;
+            }
+            
             .container { padding: 15px; }
             h1 { font-size: 1.8em; }
             .theme-switch-wrapper { top: 15px; right: 15px; }
@@ -202,24 +276,32 @@
             .controls button { flex-basis: 40%; }
         }
     </style>
+	<link rel="icon" href="al2favicon.ico"/>
 </head>
 <body>
 
 
 <script>
     (function() {
-        // 檢查 localStorage 中是否已儲存 'light' 模式
         if (localStorage.getItem('theme') === 'light') {
-            // 如果用戶明確選擇了淺色，則維持淺色
             document.body.classList.remove('dark-mode');
         } else {
-            // 在所有其他情況下（包括第一次訪問或用戶已選擇深色），都套用深色模式
             document.body.classList.add('dark-mode');
         }
     })();
 </script>
 
-
+<nav class="top-nav">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">天使之戀找怪</a>
+        <ul>
+            <li><a href="index.html">怪物篩選器</a></li>
+            <li><a href="Japanese.html">Japanese(日語版)</a></li>
+            <li><a href="English.html">English(英語版)</a></li>
+			<li><a href="rich.html">飾品數值</a></li>
+        </ul>
+    </div>
+</nav>
 
 <div class="container">
     <div class="theme-switch-wrapper">
