@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Map Filter (with Dark Mode)</title>
+    <style>
+        /* --- 1. 定義顏色變數 --- */
+        :root {
+            --bg-color: #f0f2f5;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --header-color: #1d3557;
+            --secondary-header-color: #457b9d;
+            --border-color: #457b9d;
+            --subtle-border-color: #a8dadc;
+            --interactive-text-color: #457b9d;
+            --interactive-bg-hover: #f1faee;
+            --active-bg: #457b9d;
+            --active-text: #ffffff;
+            --clear-btn-bg: #e63946;
+            --clear-btn-hover-bg: #d00000;
+            --info-panel-bg: #f1faee;
+            --list-item-bg: #f8f9fa;
+            --found-monster-text: #2a9d8f;
+            --placeholder-bg: #f8f9fa;
+            --placeholder-text: #6c757d;
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --header-color: #a8dadc;
+            --secondary-header-color: #8ecae6;
+            --border-color: #8ecae6;
+            --subtle-border-color: #457b9d;
+            --interactive-text-color: #8ecae6;
+            --interactive-bg-hover: #2a3a4a;
+            --active-bg: #8ecae6;
+            --active-text: #121212;
+            --clear-btn-bg: #d90429;
+            --clear-btn-hover-bg: #ef233c;
+            --info-panel-bg: #2b3a42;
+            --list-item-bg: #2c2c2c;
+            --found-monster-text: #80ed99;
+            --placeholder-bg: #2c2c2c;
+            --placeholder-text: #adb5bd;
+            --shadow-color: rgba(0,0,0,0.4);
+        }
+
+        /* --- 2. 套用變數到現有樣式 --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            /* 修改：為固定導覽列增加頂部空間 */
+            padding: 85px 15px 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- 新增：固定導覽列樣式 --- */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--container-bg);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            z-index: 1000;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px; /* 配合 main .container 的 padding */
+        }
+
+        .nav-logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--header-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .top-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 25px;
+        }
+
+        .top-nav li a {
+            text-decoration: none;
+            color: var(--interactive-text-color);
+            font-weight: 500;
+            padding-bottom: 5px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .top-nav li a:hover {
+            color: var(--header-color);
+        }
+
+        .top-nav li a.active {
+            color: var(--header-color);
+            border-bottom-color: var(--active-bg);
+        }
+        /* --- 結束新增樣式 --- */
+
+        .container {
+            position: relative;
+            max-width: 800px;
+            margin: auto;
+            background: var(--container-bg);
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: background-color 0.3s;
+        }
+        h1 {
+            color: var(--header-color);
+            border-bottom: 3px solid var(--secondary-header-color);
+            padding-bottom: 10px;
+            font-size: 2em;
+        }
+        h2 { color: var(--header-color); font-size: 1.5em; }
+        h3 { color: var(--secondary-header-color); margin-top: 25px; }
+        p { color: var(--text-color); }
+
+        .controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; align-items: center; }
+        .controls button {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--container-bg);
+            color: var(--interactive-text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+        .controls button:hover {
+            background-color: var(--interactive-bg-hover);
+            border-color: var(--header-color);
+        }
+        .controls button.active {
+            background-color: var(--active-bg);
+            color: var(--active-text);
+            border-color: var(--active-bg);
+        }
+        .clear-btn {
+            background-color: var(--clear-btn-bg);
+            color: white;
+            border-color: var(--clear-btn-bg);
+        }
+        .clear-btn:hover {
+            background-color: var(--clear-btn-hover-bg);
+            border-color: var(--clear-btn-hover-bg);
+        }
+        .filter-options { display: flex; gap: 20px; align-items: center; margin-left: auto; }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+        .checkbox-wrapper input { cursor: pointer; }
+
+        .info-panel {
+            background-color: var(--info-panel-bg);
+            border-left: 4px solid var(--subtle-border-color);
+            padding: 12px 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        #results ul { list-style-type: none; padding-left: 0; }
+        #results li {
+            background: var(--list-item-bg); margin-bottom: 8px; padding: 12px 15px;
+            border-left: 5px solid var(--subtle-border-color); border-radius: 4px; display: flex;
+            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .map-name { font-weight: bold; color: var(--header-color); }
+        .found-monsters { font-size: 0.9em; color: var(--found-monster-text); }
+        .placeholder {
+            color: var(--placeholder-text); text-align: center; padding: 30px 15px;
+            background-color: var(--placeholder-bg); border-radius: 8px;
+        }
+
+        /* --- 3. 黑暗模式切換開關的樣式 --- */
+        .theme-switch-wrapper {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+        }
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 50px;
+        }
+        .theme-switch input {
+            display:none;
+        }
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+        }
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 16px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 16px;
+        }
+        input:checked + .slider {
+            background-color: var(--active-bg);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23ffc300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        body.dark-mode .slider.round:before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>');
+        }
+        
+        @media (max-width: 768px) {
+            body { 
+                /* 調整手機版 body padding */
+                padding: 75px 5px 10px; 
+            }
+            .nav-container {
+                padding: 10px 15px;
+            }
+            .top-nav ul {
+                gap: 15px;
+            }
+            .nav-logo {
+                font-size: 1.2em;
+            }
+            .top-nav li a {
+                font-size: 0.9em;
+            }
+            
+            .container { padding: 15px; }
+            h1 { font-size: 1.8em; }
+            .theme-switch-wrapper { top: 15px; right: 15px; }
+            .controls button { flex-grow: 1; }
+            .filter-options { width: 100%; margin-left: 0; order: 98; justify-content: center; }
+            .clear-btn { margin-left: 0; width: 100%; order: 99; background-color: var(--clear-btn-bg); }
+        }
+        @media (max-width: 480px) {
+            .controls { gap: 8px; }
+            .controls button { flex-basis: 40%; }
+        }
+    </style>
+	<link rel="icon" href="al2favicon.ico"/>
+</head>
+<body>
+
+
+<script>
+    (function() {
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.remove('dark-mode');
+        } else {
+            document.body.classList.add('dark-mode');
+        }
+    })();
+</script>
+
+<nav class="top-nav">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">天使之戀找怪</a>
+        <ul>
+            <li><a href="index.html">怪物篩選器</a></li>
+            <li><a href="Japanese.html">Japanese(日語版)</a></li>
+            <li><a href="English.html">English(英語版)</a></li>
+			<li><a href="rich.html">飾品數值</a></li>
+        </ul>
+    </div>
+</nav></nav>
+
+<div class="container">
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="dark-mode-toggle">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <h1>Monster Map Filter</h1>
+    <p>Default is strict mode (must match all). You can multi-select monster types and switch to lenient mode (match any) via the checkbox.<br>
+    Data is missing for areas after Explorer's Camp as I haven't defeated them yet.</p>
+    <div id="controls" class="controls">
+    </div>
+    <div id="results">
+    </div>
+</div>
+
+<script>
+    // Data section
+    const monsterTypes = [ "Animal", "Plant", "Element", "Humanoid", "Construct", "Insect", "Undead", "Demon", "Giant", "Dragon", "Spirit" ];
+    const mapData = [ { region: "Athens Sanctuary", maps: [ { name: "Sanctuary Garden", monsters: ["Element", "Plant"] }, { name: "Sanctuary Garden - Depths", monsters: ["Element", "Plant"] }, { name: "Sanctuary Flower Garden", monsters: ["Element", "Plant"] } ] }, { region: "Citadel of Light", maps: [ { name: "Jade Lakeside", monsters: ["Element", "Plant", "Animal"] }, { name: "Town of Light - Outskirts", monsters: ["Humanoid", "Animal", "Construct"] }, { name: "Citadel Passage", monsters: ["Animal", "Element", "Humanoid"] }, { name: "Winding Hills", monsters: ["Animal", "Plant", "Element", "Humanoid"] }, { name: "Harbor Coast", monsters: ["Animal", "Element", "Humanoid"] }, { name: "Abandoned Pier", monsters: ["Animal", "Element", "Humanoid"] }, { name: "Coastal Corridor", monsters: ["Animal", "Element", "Humanoid"] }, { name: "Sunrise Farm - Part 1", monsters: ["Animal", "Element", "Humanoid", "Construct", "Plant"] } ] }, { region: "Moonshadow Woods", maps: [ { name: "Sunrise Farm - Part 2", monsters: ["Animal", "Element", "Humanoid", "Construct", "Plant"] }, { name: "Forest Outskirts", monsters: ["Animal", "Element", "Plant"] }, { name: "Flower Sea Labyrinth", monsters: ["Element", "Plant", "Insect"] }, { name: "Crystal Secret Path", monsters: ["Animal", "Humanoid", "Plant", "Insect"] }, { name: "Deep Forest Sanctum", monsters: ["Animal", "Plant", "Insect"] }, { name: "Abandoned Mine", monsters: ["Animal", "Humanoid", "Insect"] }, { name: "Mine - Depths", monsters: ["Animal", "Element", "Humanoid", "Undead"] }, { name: "Withered Woods", monsters: ["Animal", "Element", "Plant", "Undead", "Demon"] }, { name: "Savage Tribe", monsters: ["Humanoid", "Plant", "Demon"] }, { name: "Spore Trail", monsters: ["Animal", "Plant", "Insect"] }, { name: "Desert Oasis", monsters: ["Animal", "Plant", "Insect"] }, { name: "Underground Cemetery", monsters: ["Animal", "Plant", "Undead"] }, { name: "Village of Silence", monsters: ["Undead"] }, { name: "Moonlight Hunting Grounds - Part 1", monsters: ["Animal", "Humanoid", "Insect"] }, { name: "Moonlight Hunting Grounds - Part 2", monsters: ["Animal", "Element", "Plant", "Insect"] } ] }, { region: "Hades Underworld", maps: [ { name: "Moonlight Hunting Grounds - Part 3", monsters: ["Plant", "Insect", "Undead"] }, { name: "Whispering House", monsters: ["Humanoid", "Undead", "Demon"] }, { name: "Hall of the Dead", monsters: ["Humanoid", "Undead", "Demon"] }, { name: "Realm of the Lost", monsters: ["Animal", "Humanoid", "Undead"] }, { name: "Twisted Path", monsters: ["Plant", "Construct", "Insect", "Demon"] }, { name: "River Styx Town", monsters: ["Humanoid", "Demon"] }, { name: "Styx Basin", monsters: ["Humanoid", "Insect", "Demon", "Giant"] }, { name: "Black Desert", monsters: ["Insect", "Demon"] }, { name: "Twilight Market", monsters: ["Humanoid", "Insect", "Demon"] }, { name: "Place of Rest", monsters: ["Animal", "Humanoid", "Demon"] }, { name: "Damp Cavern", monsters: ["Insect", "Demon", "Dragon"] }, { name: "Cursed Land", monsters: ["Animal", "Element", "Humanoid", "Insect"] }, { name: "Scorched Veins", monsters: ["Animal", "Element", "Humanoid"] }, { name: "Gloomy Path - Part 1", monsters: ["Humanoid", "Insect", "Demon", "Giant"] }, { name: "Gloomy Path - Part 2", monsters: ["Animal", "Element", "Humanoid", "Insect", "Demon", "Dragon"] } ] }, { region: "Azure Water Capital", maps: [ { name: "Heracles Fishing Port", monsters: ["Animal", "Humanoid"] }, { name: "Coastal Dam", monsters: ["Animal", "Humanoid"] }, { name: "Giant Deep Channel", monsters: ["Animal", "Humanoid", "Dragon"] }, { name: "Shipwreck Graveyard", monsters: ["Animal"] }, { name: "Ancient Ghost Ship", monsters: ["Undead"] }, { name: "Marathon Shelf", monsters: ["Animal", "Humanoid"] }, { name: "Deep Sea Stone Forest", monsters: ["Animal"] }, { name: "Azure Corridor", monsters: ["Element", "Humanoid", "Demon", "Dragon"] }, { name: "Reef Seabed", monsters: ["Animal", "Element", "Demon", "Dragon"] }, { name: "Cretan Shore", monsters: ["Animal", "Plant", "Humanoid", "Demon"] } ] }, { region: "Emerald Plains", maps: [ { name: "Mist Forest", monsters: ["Animal", "Plant", "Element", "Insect"] }, { name: "Underground Tree Hollow", monsters: ["Animal", "Plant", "Insect", "Undead"] }, { name: "Abyss of Eternal Night", monsters: ["Animal", "Humanoid", "Insect", "Undead"] }, { name: "Rainforest", monsters: ["Animal"] }, { name: "Giant Tree Forest", monsters: ["Animal", "Plant", "Insect"] }, { name: "Ancient Dragon Gorge", monsters: ["Animal", "Construct", "Dragon"] }, { name: "Deep Mountain Altar", monsters: ["Animal", "Plant"] }, { name: "Underground Settlement - Spirit (Bottom center of map. Can go there directly after clearing Bandit's Tribe)", monsters: ["Humanoid", "Insect", "Undead", "Spirit"] }, { name: "Bandit's Tribe", monsters: ["Animal", "Spirit"] } ] }, { region: "Olympus Citadel", maps: [ { name: "Green Vine Passage", monsters: ["Animal", "Construct", "Insect"] }, { name: "Mount Olympus", monsters: ["Humanoid", "Construct"] } ] }, { region: "Dwarven Keep", maps: [ { name: "Iron Forest", monsters: ["Plant", "Humanoid", "Giant"] }, { name: "Ruined Iron Forest", monsters: ["Plant", "Humanoid", "Giant"] }, { name: "Gnome Village", monsters: ["Humanoid", "Construct"] }, { name: "Fountain of Wisdom", monsters: ["Animal", "Plant", "Insect"] } ] }, { region: "Asgard", maps: [ { name: "Rainbow Bridge", monsters: ["Element"] }, { name: "Seaside Tribe", monsters: ["Animal", "Humanoid"] }, { name: "Sacred Spring", monsters: ["Animal", "Element"] }, { name: "Sanctuary of Wisdom", monsters: ["Animal", "Insect", "Giant"] }, { name: "Ancient Battlefield", monsters: ["Construct", "Undead"] }, { name: "Elven Kingdom", monsters: ["Element", "Humanoid"] } ] }, { region: "Ruined Asgard", maps: [ { name: "Ruined Rainbow Bridge", monsters: ["Element"] }, { name: "Ruined Seaside Tribe", monsters: ["Humanoid"] }, { name: "Ruined Sacred Spring", monsters: ["Animal", "Demon", "Giant"] }, { name: "Ruined Sanctuary of Wisdom", monsters: ["Animal", "Plant", "Demon"] }, { name: "Ruined Ancient Battlefield", monsters: ["Humanoid", "Undead", "Demon"] }, { name: "Ruined Elven Kingdom", monsters: ["Humanoid", "Construct"] }, { name: "Savage Pass", monsters: ["Animal", "Dragon"] } ] }, { region: "Dragon Tamer's Valley", maps: [ { name: "Hatchling Pen", monsters: ["Humanoid", "Dragon"] }, { name: "Jungle Bend", monsters: ["Plant", "Dragon"] }, { name: "Cannibal's Land", monsters: ["Animal", "Humanoid"] }, { name: "Dragon's Rest Garden", monsters: ["Animal", "Dragon"] }, { name: "Savage Outpost", monsters: ["Humanoid", "Dragon"] }, { name: "Behemoth Heights", monsters: ["Animal", "Humanoid", "Dragon"] }, { name: "Oasis of the Dead", monsters: ["Animal", "Construct", "Insect", "Undead"] }, { name: "Valley of the Guardians", monsters: ["Animal", "Humanoid", "Construct", "Undead"] }, { name: "Savage Corridor", monsters: ["Animal", "Plant", "Humanoid", "Dragon"] } ] }, { region: "Crescent Spring", maps: [ { name: "Forgotten City", monsters: ["Animal", "Demon"] }, { name: "Spirit Riverbank", monsters: ["Animal", "Humanoid", "Dragon"] }, { name: "Tomb of the Pyramid", monsters: ["Humanoid", "Undead", "Demon"] }, { name: "Silk Road", monsters: ["Animal", "Plant", "Construct", "Undead", "Demon"] }, { name: "Thousand Buddha Grottoes", monsters: ["Humanoid", "Undead", "Demon"] }, { name: "Forest Relay Station", monsters: ["Animal", "Construct"] }, { name: "Bandit Stronghold", monsters: ["Animal", "Humanoid", "Construct", "Undead"] }, { name: "Pegasus Ranch", monsters: ["Animal", "Plant", "Humanoid"] }, { name: "Bandit Cave", monsters: ["Animal", "Humanoid", "Construct"] }, { name: "Nomad Plains", monsters: ["Animal", "Plant", "Humanoid"] } ] }, { region: "Shuntian Fu", maps: [ { name: "Mountain Path", monsters: ["Animal", "Humanoid", "Construct", "Insect"] }, { name: "Wasteland of Passage", monsters: ["Animal", "Plant", "Construct"] }, { name: "Eternal Nirvana", monsters: ["Animal", "Humanoid", "Construct", "Demon"] }, { name: "Path to the Underworld", monsters: ["Animal", "Demon"] }, { name: "Hell", monsters: ["Animal", "Insect", "Demon"] } ] }, { region: "Wings of the Gods", maps: [ { name: "The Great Wide World", monsters: ["Animal", "Plant"] }, { name: "Western Planet", monsters: ["Humanoid", "Construct"] }, { name: "Railway Planet", monsters: ["Plant", "Humanoid", "Construct"] }, { name: "Millennial Planet", monsters: ["Humanoid", "Undead", "Demon"] }, { name: "White Dolphin Star", monsters: ["Animal", "Plant", "Humanoid"] }, { name: "Ancient Planet", monsters: ["Animal", "Humanoid", "Construct"] } ] }, { region: "Sakura Dance Capital", maps: [ { name: "True Black Market", monsters: ["Animal", "Humanoid"] }, { name: "Wild Cherry Forest", monsters: ["Animal", "Plant"] }, { name: "Warm Wind Hot Springs", monsters: ["Animal", "Construct"] }, { name: "Underground Ninja Village", monsters: ["Animal", "Plant", "Undead"] }, { name: "Night Parade of One Hundred Demons", monsters: ["Construct", "Undead"] } ] }, { region: "Vixen Castle", maps: [ { name: "Pink Cherry Path", monsters: ["Animal", "Plant"] }, { name: "Military Fortress", monsters: ["Humanoid", "Construct"] }, { name: "Abandoned Mine Tunnel", monsters: ["Plant", "Construct", "Undead"] }, { name: "Sulfur Factory", monsters: ["Humanoid", "Undead"] }, { name: "Suburban Trade Route", monsters: ["Plant"] } ] }, { region: "City of Ice and Snow", maps: [ { name: "Igloo Settlement", monsters: ["Animal", "Construct"] }, { name: "Crisp Ice Passage", monsters: ["Animal", "Construct"] }, { name: "Shining Valley", monsters: ["Construct", "Demon"] }, { name: "Frost Forest", monsters: ["Animal", "Construct", "Spirit"] }, { name: "Frosted Lakeshore", monsters: ["Animal"] }, { name: "Crystal Mine", monsters: ["Animal"] } ] }, { region: "Explorer's Camp", maps: [ { name: "Withered Wastes", monsters: ["Humanoid", "Spirit"] }, { name: "Upstream Jungle - Spirit (Go left immediately upon entering)", monsters: ["Animal", "Spirit"] }, { name: "Cursed Forest", monsters: ["Humanoid"] }, { name: "Downstream Lakeside", monsters: ["Animal", "Construct"] }, { name: "Rainbow Shell Harbor", monsters: ["Animal", "Humanoid"] } ] }, { region: "Volcanic Front", maps: [ { name: "Native Tribe", monsters: ["Plant", "Humanoid"] }, { name: "Molten Path", monsters: ["Animal", "Humanoid"] }, { name: "Hot Spring Ruins", monsters: ["Animal"] }, { name: "Shrieking Flower Forest", monsters: ["Dragon", "Animal"] }, { name: "Burning Secret Realm", monsters: ["Element", "Plant"] } ] }, { region: "Floating Sanctuary", maps: [ { name: "Deadly Jungle", monsters: ["Construct", "Animal"] }, { name: "Mirror Lake Shore", monsters: ["Animal", "Construct"] } ] }, { region: "Sunken Labyrinth City", maps: [ { name: "Coastal Harbor", monsters: ["Demon", "Animal"] } ] } ];
+
+    const controlsContainer = document.getElementById('controls');
+    const resultsContainer = document.getElementById('results');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+    let selectedTypes = [];
+
+    // Filter logic
+    function toggleSelection(type, buttonElement) {
+        buttonElement.classList.toggle('active');
+        const index = selectedTypes.indexOf(type);
+        if (index > -1) {
+            selectedTypes.splice(index, 1);
+        } else {
+            selectedTypes.push(type);
+        }
+        updateMapDisplay();
+    }
+
+    function clearAllSelections() {
+        selectedTypes = [];
+        const allButtons = document.querySelectorAll('#controls button.active');
+        allButtons.forEach(btn => btn.classList.remove('active'));
+        document.getElementById('filter-mode-checkbox').checked = false; 
+        updateMapDisplay();
+    }
+
+    function updateMapDisplay() {
+        const useOrLogic = document.getElementById('filter-mode-checkbox').checked;
+        let html = '';
+        if (selectedTypes.length === 0) {
+            const totalMaps = mapData.reduce((count, region) => count + region.maps.length, 0);
+            html = `<div class="info-panel"><strong>Showing all maps</strong> (${totalMaps} total)</div><h2>Map Overview</h2>`;
+            mapData.forEach(region => {
+                html += `<h3>${region.region}</h3><ul>`;
+                region.maps.forEach(map => {
+                    html += `<li><span class="map-name">${map.name}</span><span class="found-monsters">(Contains: ${map.monsters.join(', ')})</span></li>`;
+                });
+                html += `</ul>`;
+            });
+        }
+        else {
+            let filteredData;
+            let infoText;
+            if (useOrLogic) {
+                // CHECKED: OR Logic (Lenient)
+                infoText = `Filter Mode: Showing maps that contain <strong>any</strong> of the selected types: <strong>[${selectedTypes.join(', ')}]</strong>`;
+                filteredData = mapData.map(region => {
+                    const matchingMaps = region.maps.filter(map => selectedTypes.some(type => map.monsters.includes(type)));
+                    return { ...region, maps: matchingMaps };
+                }).filter(region => region.maps.length > 0);
+            } else {
+                // UNCHECKED (Default): AND Logic (Strict)
+                infoText = `Filter Mode: Showing maps that contain <strong>all</strong> of the selected types: <strong>[${selectedTypes.join(', ')}]</strong>`;
+                filteredData = mapData.map(region => {
+                    const matchingMaps = region.maps.filter(map => selectedTypes.every(type => map.monsters.includes(type)));
+                    return { ...region, maps: matchingMaps };
+                }).filter(region => region.maps.length > 0);
+            }
+            html = `<div class="info-panel">${infoText}</div>`;
+            const totalFound = filteredData.reduce((count, region) => count + region.maps.length, 0);
+            if (totalFound > 0) {
+                html += `<h2>Search Results</h2>`;
+                filteredData.forEach(region => {
+                    html += `<h3>${region.region}</h3><ul>`;
+                    region.maps.forEach(map => {
+                        const matchedTypes = map.monsters.filter(m => selectedTypes.includes(m));
+                        html += `<li><span class="map-name">${map.name}</span><span class="found-monsters">(Matches: ${matchedTypes.join(', ')})</span></li>`;
+                    });
+                    html += `</ul>`;
+                });
+            } else {
+                html += `<p class="placeholder">No maps were found matching the criteria.</p>`;
+            }
+        }
+        resultsContainer.innerHTML = html;
+    }
+
+    // --- Initial UI Setup ---
+    monsterTypes.forEach(type => {
+        const button = document.createElement('button');
+        button.textContent = type;
+        button.dataset.type = type;
+        button.onclick = () => toggleSelection(type, button);
+        controlsContainer.appendChild(button);
+    });
+
+    const filterOptionsContainer = document.createElement('div');
+    filterOptionsContainer.className = 'filter-options';
+
+    const checkboxWrapper = document.createElement('label');
+    checkboxWrapper.className = 'checkbox-wrapper';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = 'filter-mode-checkbox';
+    checkbox.onchange = updateMapDisplay;
+    checkboxWrapper.appendChild(checkbox);
+    checkboxWrapper.append('Switch to Lenient Mode (Match Any)');
+    filterOptionsContainer.appendChild(checkboxWrapper);
+
+    const clearButton = document.createElement('button');
+    clearButton.textContent = 'Clear Selection';
+    clearButton.className = 'clear-btn';
+    clearButton.onclick = clearAllSelections;
+    filterOptionsContainer.appendChild(clearButton);
+
+    controlsContainer.appendChild(filterOptionsContainer);
+    
+    // --- Dark Mode Logic ---
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.checked = true;
+        } else {
+            document.body.classList.remove('dark-mode');
+            darkModeToggle.checked = false;
+        }
+    }
+
+    darkModeToggle.addEventListener('change', () => {
+        const theme = darkModeToggle.checked ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+        applyTheme(theme);
+    });
+
+// 頁面載入時，決定主題並同步開關狀態
+const savedTheme = localStorage.getItem('theme');
+// 如果用戶沒有儲存的偏好，預設值就設為 'dark'
+const initialTheme = savedTheme || 'dark';
+applyTheme(initialTheme);
+
+    // Finally, run the initial map display
+    updateMapDisplay();
+
+</script>
+
+</body>
+</html>
