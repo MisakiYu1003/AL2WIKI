@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>怪物地圖篩選器 (含黑暗模式)</title>
+    <style>
+        /* --- 1. 定義顏色變數 --- */
+        :root {
+            --bg-color: #f0f2f5;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --header-color: #1d3557;
+            --secondary-header-color: #457b9d;
+            --border-color: #457b9d;
+            --subtle-border-color: #a8dadc;
+            --interactive-text-color: #457b9d;
+            --interactive-bg-hover: #f1faee;
+            --active-bg: #457b9d;
+            --active-text: #ffffff;
+            --clear-btn-bg: #e63946;
+            --clear-btn-hover-bg: #d00000;
+            --info-panel-bg: #f1faee;
+            --list-item-bg: #f8f9fa;
+            --found-monster-text: #2a9d8f;
+            --placeholder-bg: #f8f9fa;
+            --placeholder-text: #6c757d;
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --header-color: #a8dadc;
+            --secondary-header-color: #8ecae6;
+            --border-color: #8ecae6;
+            --subtle-border-color: #457b9d;
+            --interactive-text-color: #8ecae6;
+            --interactive-bg-hover: #2a3a4a;
+            --active-bg: #8ecae6;
+            --active-text: #121212;
+            --clear-btn-bg: #d90429;
+            --clear-btn-hover-bg: #ef233c;
+            --info-panel-bg: #2b3a42;
+            --list-item-bg: #2c2c2c;
+            --found-monster-text: #80ed99;
+            --placeholder-bg: #2c2c2c;
+            --placeholder-text: #adb5bd;
+            --shadow-color: rgba(0,0,0,0.4);
+        }
+
+        /* --- 2. 套用變數到現有樣式 --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px 15px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            position: relative;
+            max-width: 800px;
+            margin: auto;
+            background: var(--container-bg);
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: background-color 0.3s;
+        }
+        h1 {
+            color: var(--header-color);
+            border-bottom: 3px solid var(--secondary-header-color);
+            padding-bottom: 10px;
+            font-size: 2em;
+        }
+        h2 { color: var(--header-color); font-size: 1.5em; }
+        h3 { color: var(--secondary-header-color); margin-top: 25px; }
+        p { color: var(--text-color); }
+
+        .controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; align-items: center; }
+        .controls button {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--container-bg);
+            color: var(--interactive-text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+        .controls button:hover {
+            background-color: var(--interactive-bg-hover);
+            border-color: var(--header-color);
+        }
+        .controls button.active {
+            background-color: var(--active-bg);
+            color: var(--active-text);
+            border-color: var(--active-bg);
+        }
+        .clear-btn {
+            background-color: var(--clear-btn-bg);
+            color: white;
+            border-color: var(--clear-btn-bg);
+        }
+        .clear-btn:hover {
+            background-color: var(--clear-btn-hover-bg);
+            border-color: var(--clear-btn-hover-bg);
+        }
+        .filter-options { display: flex; gap: 20px; align-items: center; margin-left: auto; }
+        .checkbox-wrapper { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+        .checkbox-wrapper input { cursor: pointer; }
+
+        .info-panel {
+            background-color: var(--info-panel-bg);
+            border-left: 4px solid var(--subtle-border-color);
+            padding: 12px 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        #results ul { list-style-type: none; padding-left: 0; }
+        #results li {
+            background: var(--list-item-bg); margin-bottom: 8px; padding: 12px 15px;
+            border-left: 5px solid var(--subtle-border-color); border-radius: 4px; display: flex;
+            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .map-name { font-weight: bold; color: var(--header-color); }
+        .found-monsters { font-size: 0.9em; color: var(--found-monster-text); }
+        .placeholder {
+            color: var(--placeholder-text); text-align: center; padding: 30px 15px;
+            background-color: var(--placeholder-bg); border-radius: 8px;
+        }
+
+        /* --- 3. 黑暗模式切換開關的樣式 --- */
+        .theme-switch-wrapper {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+        }
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 50px;
+        }
+        .theme-switch input {
+            display:none;
+        }
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+        }
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 16px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 16px;
+        }
+        input:checked + .slider {
+            background-color: var(--active-bg);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23ffc300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        body.dark-mode .slider.round:before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>');
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px 5px; }
+            .container { padding: 15px; }
+            h1 { font-size: 1.8em; }
+            .theme-switch-wrapper { top: 15px; right: 15px; }
+            .controls button { flex-grow: 1; }
+            .filter-options { width: 100%; margin-left: 0; order: 98; justify-content: center; }
+            .clear-btn { margin-left: 0; width: 100%; order: 99; background-color: var(--clear-btn-bg); }
+        }
+        @media (max-width: 480px) {
+            .controls { gap: 8px; }
+            .controls button { flex-basis: 40%; }
+        }
+    </style>
+</head>
+<body>
+
+
+<script>
+    (function() {
+        // 檢查 localStorage 中是否已儲存 'light' 模式
+        if (localStorage.getItem('theme') === 'light') {
+            // 如果用戶明確選擇了淺色，則維持淺色
+            document.body.classList.remove('dark-mode');
+        } else {
+            // 在所有其他情況下（包括第一次訪問或用戶已選擇深色），都套用深色模式
+            document.body.classList.add('dark-mode');
+        }
+    })();
+</script>
+
+
+
+<div class="container">
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="dark-mode-toggle">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <h1>怪物地圖篩選器</h1>
+    <p>預設顯示所有地圖。列表會顯示選取的類型該地圖會出現該類型的怪物。(可複選)<br>
+    探索者營地後面的我打不過所以沒資料</p>
+    <div id="controls" class="controls">
+    </div>
+    <div id="results">
+    </div>
+</div>
+
+<script>
+    // 資料部分與之前版本相同
+    const monsterTypes = [ "動物", "植物", "元素", "人型", "創造", "昆蟲", "死靈", "惡魔", "巨人", "龍", "聖靈" ];
+    const mapData = [ { region: "雅典聖域", maps: [ { name: "聖域庭園", monsters: ["元素", "植物"] }, { name: "聖域庭園深處", monsters: ["元素", "植物"] }, { name: "聖域花園", monsters: ["元素", "植物"] } ] }, { region: "光明城邦", maps: [ { name: "翡翠湖畔", monsters: ["元素", "植物", "動物"] }, { name: "光明城鎮近郊", monsters: ["人型", "動物", "創造"] }, { name: "城邦通道", monsters: ["動物", "元素", "人型"] }, { name: "迴旋之丘", monsters: ["動物", "植物", "元素", "人型"] }, { name: "港邊灣岸", monsters: ["動物", "元素", "人型"] }, { name: "廢棄碼頭", monsters: ["動物", "元素", "人型"] }, { name: "海岸長廊", monsters: ["動物", "元素", "人型"] }, { name: "朝陽農莊前段", monsters: ["動物", "元素", "人型", "創造", "植物"] } ] }, { region: "月影林地", maps: [ { name: "朝陽農莊後段", monsters: ["動物", "元素", "人型", "創造", "植物"] }, { name: "森林郊區", monsters: ["動物", "元素", "植物"] }, { name: "花海迷宮", monsters: ["元素", "植物", "昆蟲"] }, { name: "水晶秘徑", monsters: ["動物", "人型", "植物", "昆蟲"] }, { name: "密林聖地", monsters: ["動物", "植物", "昆蟲"] }, { name: "廢棄礦坑", monsters: ["動物", "人型", "昆蟲"] }, { name: "礦坑深處", monsters: ["動物", "元素", "人型", "死靈"] }, { name: "枯樹林", monsters: ["動物", "元素", "植物", "死靈", "惡魔"] }, { name: "野蠻部落", monsters: ["人型", "植物", "惡魔"] }, { name: "孢子小徑", monsters: ["動物", "植物", "昆蟲"] }, { name: "沙漠綠洲", monsters: ["動物", "植物", "昆蟲"] }, { name: "地下墳場", monsters: ["動物", "植物", "死靈"] }, { name: "死寂之里", monsters: ["死靈"] }, { name: "月光獵場前段", monsters: ["動物", "人型", "昆蟲"] }, { name: "月光獵場中段", monsters: ["動物", "元素", "植物", "昆蟲"] } ] }, { region: "幽暗冥府", maps: [ { name: "月光獵場後段", monsters: ["植物", "昆蟲", "死靈"] }, { name: "呢喃之屋", monsters: ["人型", "死靈", "惡魔"] }, { name: "死者殿堂", monsters: ["人型", "死靈", "惡魔"] }, { name: "亡者幻境", monsters: ["動物", "人型", "死靈"] }, { name: "扭曲小徑", monsters: ["植物", "創造", "昆蟲", "惡魔"] }, { name: "成鎮冥河", monsters: ["人型", "惡魔"] }, { name: "冥河流域", monsters: ["人型", "昆蟲", "惡魔", "巨人"] }, { name: "黑色沙漠", monsters: ["昆蟲", "惡魔"] }, { name: "暮色市集", monsters: ["人型", "昆蟲", "惡魔"] }, { name: "安息之地", monsters: ["動物", "人型", "惡魔"] }, { name: "潮濕地穴", monsters: ["昆蟲", "惡魔", "龍"] }, { name: "詛咒之地", monsters: ["動物", "元素", "人型", "昆蟲"] }, { name: "焦炎地脈", monsters: ["動物", "元素", "人型"] }, { name: "幽暗曲徑前段", monsters: ["人型", "昆蟲", "惡魔", "巨人"] }, { name: "幽暗曲徑後段", monsters: ["動物", "元素", "人型", "昆蟲", "惡魔", "龍"] } ] }, { region: "湛藍水都", maps: [ { name: "赫卡勒漁港", monsters: ["動物", "人型"] }, { name: "近海水壩", monsters: ["動物", "人型"] }, { name: "巨深航道", monsters: ["動物", "人型", "龍"] }, { name: "沈船墳場", monsters: ["動物"] }, { name: "鬼靈古船", monsters: ["死靈"] }, { name: "馬拉松陸棚", monsters: ["動物", "人型"] }, { name: "深海石林", monsters: ["動物"] }, { name: "湛藍走廊", monsters: ["元素", "人型", "惡魔", "龍"] }, { name: "礁岩海床", monsters: ["動物", "元素", "惡魔", "龍"] }, { name: "克里特岸地", monsters: ["動物", "植物", "人型", "惡魔"] } ] }, { region: "翡翠平原", maps: [ { name: "迷霧森林", monsters: ["動物", "植物", "元素", "昆蟲"] }, { name: "地底樹洞", monsters: ["動物", "植物", "昆蟲", "死靈"] }, { name: "永夜之淵", monsters: ["動物", "人型", "昆蟲", "死靈"] }, { name: "熱帶雨林", monsters: ["動物"] }, { name: "巨木樹林", monsters: ["動物", "植物", "昆蟲"] }, { name: "古龍峽谷", monsters: ["動物", "創造", "龍"] }, { name: "深山祭壇", monsters: ["動物", "植物"] }, { name: "地底部落-聖靈(地圖中間下面能打過盜賊部落就直接去那邊)", monsters: ["人型", "昆蟲", "死靈", "聖靈"] }, { name: "盜賊部落", monsters: ["動物", "聖靈"] } ] }, { region: "奧林帕斯城塞", maps: [ { name: "綠蔓通道", monsters: ["動物", "創造", "昆蟲"] }, { name: "奧林帕斯山", monsters: ["人型", "創造"] } ] }, { region: "矮人古堡", maps: [ { name: "鐵森林", monsters: ["植物", "人型", "巨人"] }, { name: "鐵森林毀", monsters: ["植物", "人型", "巨人"] }, { name: "侏儒之鄉", monsters: ["人型", "創造"] }, { name: "智慧之泉", monsters: ["動物", "植物", "昆蟲"] } ] }, { region: "阿斯嘉特", maps: [ { name: "彩虹橋", monsters: ["元素"] }, { name: "海邊部落", monsters: ["動物", "人型"] }, { name: "神聖之泉", monsters: ["動物", "元素"] }, { name: "智慧聖域", monsters: ["動物", "昆蟲", "巨人"] }, { name: "遠古戰場", monsters: ["創造", "死靈"] }, { name: "精靈國度", monsters: ["元素", "人型"] } ] }, { region: "阿斯嘉特毀", maps: [ { name: "彩虹橋毀", monsters: ["元素"] }, { name: "海邊部落毀", monsters: ["人型"] }, { name: "神聖之泉毀", monsters: ["動物", "惡魔", "巨人"] }, { name: "智慧聖域毀", monsters: ["動物", "植物", "惡魔"] }, { name: "遠古戰場毀", monsters: ["人型", "死靈", "惡魔"] }, { name: "精靈國度毀", monsters: ["人型", "創造"] }, { name: "蠻荒隘口", monsters: ["動物", "龍"] } ] }, { region: "馴龍谷", maps: [ { name: "幼龍飼育場", monsters: ["人型", "龍"] }, { name: "叢林彎道", monsters: ["植物", "龍"] }, { name: "食人之地", monsters: ["動物", "人型"] }, { name: "龍棲花園", monsters: ["動物", "龍"] }, { name: "蠻荒哨口", monsters: ["人型", "龍"] }, { name: "巨獸高地", monsters: ["動物", "人型", "龍"] }, { name: "亡者綠洲", monsters: ["動物", "創造", "昆蟲", "死靈"] }, { name: "守護者之谷", monsters: ["動物", "人型", "創造", "死靈"] }, { name: "蠻荒走廊", monsters: ["動物", "植物", "人型", "龍"] } ] }, { region: "月牙泉", maps: [ { name: "遺忘之城", monsters: ["動物", "惡魔"] }, { name: "聖靈河畔", monsters: ["動物", "人型", "龍"] }, { name: "金字塔之墓", monsters: ["人型", "死靈", "惡魔"] }, { name: "絲綢之路", monsters: ["動物", "植物", "創造", "死靈", "惡魔"] }, { name: "千佛之窟", monsters: ["人型", "死靈", "惡魔"] }, { name: "林間驛站", monsters: ["動物", "創造"] }, { name: "土匪寨", monsters: ["動物", "人型", "創造", "死靈"] }, { name: "飛馬牧場", monsters: ["動物", "植物", "人型"] }, { name: "山賊窟", monsters: ["動物", "人型", "創造"] }, { name: "游牧草原", monsters: ["動物", "植物", "人型"] } ] }, { region: "順天府", maps: [ { name: "山間小路", monsters: ["動物", "人型", "創造", "昆蟲"] }, { name: "渡世荒領", monsters: ["動物", "植物", "創造"] }, { name: "永劫涅槃", monsters: ["動物", "人型", "創造", "惡魔"] }, { name: "三途秘徑", monsters: ["動物", "惡魔"] }, { name: "陰曹地府", monsters: ["動物", "昆蟲", "惡魔"] } ] }, { region: "天神巨翼", maps: [ { name: "大千世界", monsters: ["動物", "植物"] }, { name: "西部行星", monsters: ["人型", "創造"] }, { name: "鐵道行星", monsters: ["植物", "人型", "創造"] }, { name: "千年行星", monsters: ["人型", "死靈", "惡魔"] }, { name: "白暨之星", monsters: ["動物", "植物", "人型"] }, { name: "遠古行星", monsters: ["動物", "人型", "創造"] } ] }, { region: "櫻舞神都", maps: [ { name: "真黑街市", monsters: ["動物", "人型"] }, { name: "狂櫻紅林", monsters: ["動物", "植物"] }, { name: "暖風湯谷", monsters: ["動物", "創造"] }, { name: "地下忍村", monsters: ["動物", "植物", "死靈"] }, { name: "百鬼祭典", monsters: ["創造", "死靈"] } ] }, { region: "維克森城", maps: [ { name: "粉櫻參道", monsters: ["動物", "植物"] }, { name: "軍事城塞", monsters: ["人型", "創造"] }, { name: "廢棄礦道", monsters: ["植物", "創造", "死靈"] }, { name: "硫磺工廠", monsters: ["人型", "死靈"] }, { name: "城郊商道", monsters: ["植物"] } ] }, { region: "冰雪都市", maps: [ { name: "雪屋聚落", monsters: ["動物", "創造"] }, { name: "清脆產道", monsters: ["動物", "創造"] }, { name: "晶亮幽谷", monsters: ["創造", "惡魔"] }, { name: "寒霜森林", monsters: ["動物", "創造", "聖靈"] }, { name: "霜降湖岸", monsters: ["動物"] }, { name: "彩晶坑道", monsters: ["動物"] } ] }, { region: "探索者營地", maps: [ { name: "枯萎荒地", monsters: ["人型", "聖靈"] }, { name: "上游密林-聖靈(進圖直接左走)", monsters: ["動物", "聖靈"] }, { name: "詛咒森林", monsters: ["人型"] }, { name: "下游湖畔", monsters: ["動物", "創造"] }, { name: "彩貝港", monsters: ["動物", "人型"] } ] }, { region: "火山前線", maps: [ { name: "土著部落", monsters: ["植物", "人型"] }, { name: "熔火小徑", monsters: ["動物", "人型"] }, { name: "溫泉遺址", monsters: ["動物"] }, { name: "尖嘯花林", monsters: ["龍", "動物"] }, { name: "燃燒秘境", monsters: ["元素", "植物"] } ] }, { region: "浮空聖所", maps: [ { name: "致命叢林", monsters: ["創造", "動物"] }, { name: "冽鏡湖畔", monsters: ["動物", "創造"] } ] }, { region: "海底迷城", maps: [ { name: "臨海港灣", monsters: ["惡魔", "動物"] } ] } ];
+
+    const controlsContainer = document.getElementById('controls');
+    const resultsContainer = document.getElementById('results');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+    let selectedTypes = [];
+
+    // 篩選邏輯 (與前一版相同)
+    function toggleSelection(type, buttonElement) {
+        buttonElement.classList.toggle('active');
+        const index = selectedTypes.indexOf(type);
+        if (index > -1) {
+            selectedTypes.splice(index, 1);
+        } else {
+            selectedTypes.push(type);
+        }
+        updateMapDisplay();
+    }
+
+    function clearAllSelections() {
+        selectedTypes = [];
+        const allButtons = document.querySelectorAll('#controls button.active');
+        allButtons.forEach(btn => btn.classList.remove('active'));
+        document.getElementById('filter-mode-checkbox').checked = false; 
+        updateMapDisplay();
+    }
+
+    function updateMapDisplay() {
+        const useOrLogic = document.getElementById('filter-mode-checkbox').checked;
+        let html = '';
+        if (selectedTypes.length === 0) {
+            const totalMaps = mapData.reduce((count, region) => count + region.maps.length, 0);
+            html = `<div class="info-panel"><strong>顯示所有地圖</strong> (共 ${totalMaps} 張)</div><h2>地圖總覽</h2>`;
+            mapData.forEach(region => {
+                html += `<h3>${region.region}</h3><ul>`;
+                region.maps.forEach(map => {
+                    html += `<li><span class="map-name">${map.name}</span><span class="found-monsters">(含: ${map.monsters.join(', ')})</span></li>`;
+                });
+                html += `</ul>`;
+            });
+        }
+        else {
+            let filteredData;
+            let infoText;
+            if (useOrLogic) {
+                infoText = `篩選模式：地圖包含<strong>任一</strong>已選類型: <strong>[${selectedTypes.join(', ')}]</strong>`;
+                filteredData = mapData.map(region => {
+                    const matchingMaps = region.maps.filter(map => selectedTypes.some(type => map.monsters.includes(type)));
+                    return { ...region, maps: matchingMaps };
+                }).filter(region => region.maps.length > 0);
+            } else {
+                infoText = `篩選模式：地圖須<strong>同時包含</strong>所有已選類型: <strong>[${selectedTypes.join(', ')}]</strong>`;
+                filteredData = mapData.map(region => {
+                    const matchingMaps = region.maps.filter(map => selectedTypes.every(type => map.monsters.includes(type)));
+                    return { ...region, maps: matchingMaps };
+                }).filter(region => region.maps.length > 0);
+            }
+            html = `<div class="info-panel">${infoText}</div>`;
+            const totalFound = filteredData.reduce((count, region) => count + region.maps.length, 0);
+            if (totalFound > 0) {
+                html += `<h2>搜尋結果</h2>`;
+                filteredData.forEach(region => {
+                    html += `<h3>${region.region}</h3><ul>`;
+                    region.maps.forEach(map => {
+                        const matchedTypes = map.monsters.filter(m => selectedTypes.includes(m));
+                        html += `<li><span class="map-name">${map.name}</span><span class="found-monsters">(符合: ${matchedTypes.join(', ')})</span></li>`;
+                    });
+                    html += `</ul>`;
+                });
+            } else {
+                html += `<p class="placeholder">找不到任何符合條件的地圖。</p>`;
+            }
+        }
+        resultsContainer.innerHTML = html;
+    }
+
+    // --- 初始設定 ---
+    monsterTypes.forEach(type => {
+        const button = document.createElement('button');
+        button.textContent = type;
+        button.dataset.type = type;
+        button.onclick = () => toggleSelection(type, button);
+        controlsContainer.appendChild(button);
+    });
+
+    const filterOptionsContainer = document.createElement('div');
+    filterOptionsContainer.className = 'filter-options';
+
+    const checkboxWrapper = document.createElement('label');
+    checkboxWrapper.className = 'checkbox-wrapper';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = 'filter-mode-checkbox';
+    checkbox.onchange = updateMapDisplay;
+    checkboxWrapper.appendChild(checkbox);
+    checkboxWrapper.append('打勾後顯示以選則類型的全部地圖');
+    filterOptionsContainer.appendChild(checkboxWrapper);
+
+    const clearButton = document.createElement('button');
+    clearButton.textContent = '清除選擇';
+    clearButton.className = 'clear-btn';
+    clearButton.onclick = clearAllSelections;
+    filterOptionsContainer.appendChild(clearButton);
+
+    controlsContainer.appendChild(filterOptionsContainer);
+    
+    // --- 5. 黑暗模式的邏輯 ---
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.checked = true;
+        } else {
+            document.body.classList.remove('dark-mode');
+            darkModeToggle.checked = false;
+        }
+    }
+
+    darkModeToggle.addEventListener('change', () => {
+        const theme = darkModeToggle.checked ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+        applyTheme(theme);
+    });
+
+// 頁面載入時，決定主題並同步開關狀態
+const savedTheme = localStorage.getItem('theme');
+// 如果用戶沒有儲存的偏好，預設值就設為 'dark'
+const initialTheme = savedTheme || 'dark';
+applyTheme(initialTheme);
+
+    // 最後才執行第一次的地圖顯示
+    updateMapDisplay();
+
+</script>
+
+</body>
+</html>
