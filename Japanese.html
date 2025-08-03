@@ -3,121 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>モンスターマップフィルター (ダークモード付き)</title>
+    <title>モンスターマップフィルター</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="shared-styles.css">
     <style>
-        /* --- 1. 定義顏色變數 --- */
-        :root {
-            --bg-color: #f0f2f5;
-            --container-bg: #ffffff;
-            --text-color: #333;
-            --header-color: #1d3557;
-            --secondary-header-color: #457b9d;
-            --border-color: #457b9d;
-            --subtle-border-color: #a8dadc;
-            --interactive-text-color: #457b9d;
-            --interactive-bg-hover: #f1faee;
-            --active-bg: #457b9d;
-            --active-text: #ffffff;
-            --clear-btn-bg: #e63946;
-            --clear-btn-hover-bg: #d00000;
-            --info-panel-bg: #f1faee;
-            --list-item-bg: #f8f9fa;
-            --found-monster-text: #2a9d8f;
-            --placeholder-bg: #f8f9fa;
-            --placeholder-text: #6c757d;
-            --shadow-color: rgba(0,0,0,0.1);
-        }
-
-        body.dark-mode {
-            --bg-color: #121212;
-            --container-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --header-color: #a8dadc;
-            --secondary-header-color: #8ecae6;
-            --border-color: #8ecae6;
-            --subtle-border-color: #457b9d;
-            --interactive-text-color: #8ecae6;
-            --interactive-bg-hover: #2a3a4a;
-            --active-bg: #8ecae6;
-            --active-text: #121212;
-            --clear-btn-bg: #d90429;
-            --clear-btn-hover-bg: #ef233c;
-            --info-panel-bg: #2b3a42;
-            --list-item-bg: #2c2c2c;
-            --found-monster-text: #80ed99;
-            --placeholder-bg: #2c2c2c;
-            --placeholder-text: #adb5bd;
-            --shadow-color: rgba(0,0,0,0.4);
-        }
-
-        /* --- 2. 套用變數到現有樣式 --- */
+        /* index.html specific styles (reused for consistency) */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            /* 修改：為固定導覽列增加頂部空間 */
             padding: 85px 15px 20px;
-            transition: background-color 0.3s, color 0.3s;
         }
-
-        /* --- 新增：固定導覽列樣式 --- */
-        .top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--container-bg);
-            box-shadow: 0 2px 8px var(--shadow-color);
-            z-index: 1000;
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-
-        .nav-container {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px; /* 配合 main .container 的 padding */
-        }
-
-        .nav-logo {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: var(--header-color);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .top-nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 25px;
-        }
-
-        .top-nav li a {
-            text-decoration: none;
-            color: var(--interactive-text-color);
-            font-weight: 500;
-            padding-bottom: 5px;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .top-nav li a:hover {
-            color: var(--header-color);
-        }
-
-        .top-nav li a.active {
-            color: var(--header-color);
-            border-bottom-color: var(--active-bg);
-        }
-        /* --- 結束新增樣式 --- */
-
         .container {
             position: relative;
             max-width: 800px;
@@ -125,7 +22,7 @@
             background: var(--container-bg);
             padding: 20px 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px var(--shadow-color);
+            box-shadow: 0 4px 12px var(--card-shadow);
             transition: background-color 0.3s;
         }
         h1 {
@@ -191,85 +88,16 @@
             color: var(--placeholder-text); text-align: center; padding: 30px 15px;
             background-color: var(--placeholder-bg); border-radius: 8px;
         }
-
-        /* --- 3. 黑暗模式切換開關的樣式 --- */
-        .theme-switch-wrapper {
-            position: absolute;
-            top: 25px;
-            right: 30px;
-        }
-        .theme-switch {
-            display: inline-block;
-            height: 24px;
-            position: relative;
-            width: 50px;
-        }
-        .theme-switch input {
-            display:none;
-        }
-        .slider {
-            background-color: #ccc;
-            bottom: 0;
-            cursor: pointer;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            transition: .4s;
-        }
-        .slider:before {
-            background-color: #fff;
-            bottom: 4px;
-            content: "";
-            height: 16px;
-            left: 4px;
-            position: absolute;
-            transition: .4s;
-            width: 16px;
-        }
-        input:checked + .slider {
-            background-color: var(--active-bg);
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        .slider.round {
-            border-radius: 34px;
-        }
-        .slider.round:before {
-            border-radius: 50%;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23ffc300" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>');
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-        body.dark-mode .slider.round:before {
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>');
-        }
         
         @media (max-width: 768px) {
             body { 
-                /* 調整手機版 body padding */
                 padding: 75px 5px 10px; 
             }
-            .nav-container {
-                padding: 10px 15px;
-            }
-            .top-nav ul {
-                gap: 15px;
-            }
-            .nav-logo {
-                font-size: 1.2em;
-            }
-            .top-nav li a {
-                font-size: 0.9em;
-            }
-            
             .container { padding: 15px; }
             h1 { font-size: 1.8em; }
-            .theme-switch-wrapper { top: 15px; right: 15px; }
             .controls button { flex-grow: 1; }
             .filter-options { width: 100%; margin-left: 0; order: 98; justify-content: center; }
-            .clear-btn { margin-left: 0; width: 100%; order: 99; background-color: var(--clear-btn-bg); }
+            .clear-btn { margin-left: 0; width: 100%; order: 99; }
         }
         @media (max-width: 480px) {
             .controls { gap: 8px; }
@@ -280,38 +108,10 @@
 </head>
 <body>
 
-
-<script>
-    (function() {
-        if (localStorage.getItem('theme') === 'light') {
-            document.body.classList.remove('dark-mode');
-        } else {
-            document.body.classList.add('dark-mode');
-        }
-    })();
-</script>
-
-<nav class="top-nav">
-    <div class="nav-container">
-        <a href="index.html" class="nav-logo">天使之戀找怪</a>
-        <ul>
-            <li><a href="index.html">怪物篩選器</a></li>
-            <li><a href="Japanese.html">Japanese(日語版)</a></li>
-            <li><a href="English.html">English(英語版)</a></li>
-			<li><a href="rich.html">飾品數值</a></li>
-        </ul>
-    </div>
-</nav>
-
+<!-- Placeholder for the navigation bar -->
+<div id="nav-placeholder"></div>
 
 <div class="container">
-    <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="dark-mode-toggle">
-            <input type="checkbox" id="dark-mode-toggle" />
-            <span class="slider round"></span>
-        </label>
-    </div>
-
     <h1>モンスターマップフィルター</h1>
     <p>デフォルトは厳格モード（すべてに一致）です。モンスタータイプを複数選択し、チェックボックスで緩いモード（いずれかに一致）に切り替え可能です。<br>
     探索者の野営地以降は、まだ倒せていないためデータがありません。</p>
@@ -321,6 +121,7 @@
     </div>
 </div>
 
+<script src="nav.js"></script>
 <script>
     // データセクション
     const monsterTypes = [ "動物", "植物", "エレメント", "人型", "創造物", "昆虫", "アンデッド", "デーモン", "ジャイアント", "ドラゴン", "聖霊" ];
@@ -328,7 +129,6 @@
 
     const controlsContainer = document.getElementById('controls');
     const resultsContainer = document.getElementById('results');
-    const darkModeToggle = document.getElementById('dark-mode-toggle');
 
     let selectedTypes = [];
 
@@ -430,29 +230,6 @@
 
     controlsContainer.appendChild(filterOptionsContainer);
     
-    // ダークモードロジック
-    function applyTheme(theme) {
-        if (theme === 'dark') {
-            document.body.classList.add('dark-mode');
-            darkModeToggle.checked = true;
-        } else {
-            document.body.classList.remove('dark-mode');
-            darkModeToggle.checked = false;
-        }
-    }
-
-    darkModeToggle.addEventListener('change', () => {
-        const theme = darkModeToggle.checked ? 'dark' : 'light';
-        localStorage.setItem('theme', theme);
-        applyTheme(theme);
-    });
-
- // 頁面載入時，決定主題並同步開關狀態
-const savedTheme = localStorage.getItem('theme');
-// 如果用戶沒有儲存的偏好，預設值就設為 'dark'
-const initialTheme = savedTheme || 'dark';
-applyTheme(initialTheme);
-
     // 最後に、初回のマップ表示を実行
     updateMapDisplay();
 
