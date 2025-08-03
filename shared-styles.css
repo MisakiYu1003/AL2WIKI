@@ -2,73 +2,7 @@
 
 /* 1. 定義亮色與深色模式的顏色變數 */
 :root {
-    /* 亮色模式 (預設) */
-    --bg-color: #f8f9fa;
-    --text-color: #212529;
-    --nav-bg: rgba(255, 255, 255, 0.8);
-    --nav-border: #dee2e6;
-    --nav-text: #495057;
-    --nav-text-hover: #000;
-    --nav-active-text: #007bff;
-    --nav-active-border: #007bff;
-    --card-bg: #ffffff;
-    --card-border: #e9ecef;
-    --card-shadow: rgba(0, 0, 0, 0.05);
-    --header-color: #007bff;
-    --link-color: #007bff;
-    --link-hover-color: #0056b3;
-    --button-bg: #007bff;
-    --button-text: #fff;
-    --button-hover-bg: #0056b3;
-    --dropdown-bg: #ffffff;
-    --dropdown-shadow: rgba(0, 0, 0, 0.1);
-
-    /* for index.html */
-    --container-bg: #ffffff;
-    --secondary-header-color: #0056b3;
-    --border-color: #007bff;
-    --subtle-border-color: #ced4da;
-    --interactive-text-color: #007bff;
-    --interactive-bg-hover: #e9ecef;
-    --active-bg: #007bff;
-    --active-text: #ffffff;
-    --clear-btn-bg: #dc3545;
-    --clear-btn-hover-bg: #c82333;
-    --info-panel-bg: #e9ecef;
-    --list-item-bg: #f8f9fa;
-    --found-monster-text: #28a745;
-    --placeholder-bg: #e9ecef;
-    --placeholder-text: #6c757d;
-
-    /* for rich.html */
-    --rich-card-bg: #ffffff;
-    --rich-card-border: #dee2e6;
-    --rich-card-hover-border: #007bff;
-    --rich-card-selected-border: #007bff;
-    --rich-comparison-bg: rgba(255, 255, 255, 0.95);
-    --rich-comparison-border: #dee2e6;
-    --rich-stat-highlight: #28a745;
-    --rich-stat-dim: #6c757d;
-    --rich-text-slate-100: #343a40;
-    --rich-text-slate-300: #6c757d;
-    --rich-text-slate-400: #adb5bd;
-    --rich-bg-gray-700-50: rgba(233, 236, 239, 0.5);
-    --rich-text-blue-300: #007bff;
-
-    /* for about.html */
-    --about-card-bg: #fff;
-    --about-card-border: rgba(0,0,0,0.1);
-    --about-header-text: #007bff;
-    --about-divider: rgba(0, 123, 255, 0.3);
-    --about-text-main: #212529;
-    --about-text-secondary: #6c757d;
-    --about-button-bg: #007bff;
-    --about-button-text: #fff;
-    --about-button-hover-bg: #0056b3;
-}
-
-.dark-mode {
-    /* 深色模式 */
+    /* 深色模式 (預設) */
     --bg-color: #1a202c;
     --text-color: #e2e8f0;
     --nav-bg: rgba(26, 32, 44, 0.8);
@@ -133,12 +67,77 @@
     --about-button-hover-bg: #90cdf4;
 }
 
+.dark-mode {
+    /* 亮色模式 */
+    --bg-color: #f8f9fa;
+    --text-color: #212529;
+    --nav-bg: rgba(255, 255, 255, 0.8);
+    --nav-border: #dee2e6;
+    --nav-text: #495057;
+    --nav-text-hover: #000;
+    --nav-active-text: #007bff;
+    --nav-active-border: #007bff;
+    --card-bg: #ffffff;
+    --card-border: #e9ecef;
+    --card-shadow: rgba(0, 0, 0, 0.05);
+    --header-color: #007bff;
+    --link-color: #007bff;
+    --link-hover-color: #0056b3;
+    --button-bg: #007bff;
+    --button-text: #fff;
+    --button-hover-bg: #0056b3;
+    --dropdown-bg: #ffffff;
+    --dropdown-shadow: rgba(0, 0, 0, 0.1);
+
+    /* for index.html */
+    --container-bg: #ffffff;
+    --secondary-header-color: #0056b3;
+    --border-color: #007bff;
+    --subtle-border-color: #ced4da;
+    --interactive-text-color: #007bff;
+    --interactive-bg-hover: #e9ecef;
+    --active-bg: #007bff;
+    --active-text: #ffffff;
+    --clear-btn-bg: #dc3545;
+    --clear-btn-hover-bg: #c82333;
+    --info-panel-bg: #e9ecef;
+    --list-item-bg: #f8f9fa;
+    --found-monster-text: #28a745;
+    --placeholder-bg: #e9ecef;
+    --placeholder-text: #6c757d;
+
+    /* for rich.html */
+    --rich-card-bg: #ffffff;
+    --rich-card-border: #dee2e6;
+    --rich-card-hover-border: #007bff;
+    --rich-card-selected-border: #007bff;
+    --rich-comparison-bg: rgba(255, 255, 255, 0.95);
+    --rich-comparison-border: #dee2e6;
+    --rich-stat-highlight: #28a745;
+    --rich-stat-dim: #6c757d;
+    --rich-text-slate-100: #343a40;
+    --rich-text-slate-300: #6c757d;
+    --rich-text-slate-400: #adb5bd;
+    --rich-bg-gray-700-50: rgba(233, 236, 239, 0.5);
+    --rich-text-blue-300: #007bff;
+
+    /* for about.html */
+    --about-card-bg: #fff;
+    --about-card-border: rgba(0,0,0,0.1);
+    --about-header-text: #007bff;
+    --about-divider: rgba(0, 123, 255, 0.3);
+    --about-text-main: #212529;
+    --about-text-secondary: #6c757d;
+    --about-button-bg: #007bff;
+    --about-button-text: #fff;
+    --about-button-hover-bg: #0056b3;
+}
 /* 2. 全域樣式 */
 body {
     font-family: 'Noto Sans TC', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    padding-top: 70px; /* 調整導覽列高度 */
+    padding-top: 70px;
     transition: background-color 0.3s, color 0.3s;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -188,6 +187,8 @@ body {
 
 #main-nav-links > li {
     position: relative;
+    padding: 20px 0; /* 增加垂直感應區 */
+    margin: -20px 0; /* 抵銷 padding 對佈局的影響 */
 }
 
 #main-nav-links li a {
@@ -220,19 +221,21 @@ body {
 
 .dropdown-menu {
     display: none;
+    opacity: 0;
+    visibility: hidden;
     position: absolute;
-    top: 100%;
+    top: 90%; /* 微調位置，使其更靠近主連結 */
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--dropdown-bg);
     list-style: none;
     padding: 8px 0;
-    margin-top: 10px;
     min-width: 160px;
     border-radius: 8px;
     box-shadow: 0 4px 12px var(--dropdown-shadow);
     border: 1px solid var(--nav-border);
     z-index: 1100;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s;
 }
 
 .dropdown-menu li a {
@@ -246,14 +249,27 @@ body {
     background-color: var(--interactive-bg-hover);
 }
 
-.dropdown:hover .dropdown-menu {
-    display: block;
+/* 電腦版：滑鼠懸停時顯示選單 */
+@media (min-width: 901px) {
+    .dropdown:hover .dropdown-menu {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+    }
 }
+
+/* 手機版：透過 'open' class 控制顯示 */
+.dropdown.open .dropdown-menu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
 
 /* 5. 主題切換開關樣式 */
 #theme-switch-wrapper {
-    position: static; /* 在桌面版，它會自然排列 */
-    margin-left: 15px; /* 與其他連結保持間距 */
+    position: static;
+    margin-left: 15px;
 }
 
 .theme-switch {
@@ -319,7 +335,7 @@ input:checked + .slider:before {
     
     #theme-switch-wrapper {
         position: absolute;
-        right: 70px; /* 放在漢堡按鈕左邊 */
+        right: 70px;
     }
 
     #hamburger-btn {
@@ -362,12 +378,16 @@ input:checked + .slider:before {
         transition: transform 0.3s ease-in-out;
         border-left: 1px solid var(--nav-border);
     }
+    
+    #main-nav-links > li {
+        padding: 0; /* 移除手機版選單項目的額外 padding */
+        margin: 0;
+    }
 
     .top-nav.nav-open #main-nav-links {
         transform: translateX(0);
     }
 
-    /* 漢堡按鈕變 X 的動畫 */
     .top-nav.nav-open #hamburger-btn span:nth-child(1) {
         transform: rotate(45deg);
     }
@@ -390,6 +410,8 @@ input:checked + .slider:before {
         padding-left: 15px;
         background-color: transparent;
         min-width: auto;
+        opacity: 1; /* 手機版不需淡入淡出 */
+        visibility: visible;
     }
 
     .dropdown.open .dropdown-menu {
