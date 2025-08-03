@@ -4,44 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>飾品比較</title>
+    <!-- Tailwind CSS (for utility classes) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="shared-styles.css">
     <style>
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #1a202c;
-            color: #e2e8f0;
-            /* Add top padding for the fixed nav bar */
-            padding-top: 80px;
-        }
+        /* rich.html specific styles */
         .item-card {
-            border: 1px solid #4a5568;
-            background-color: #2d3748;
+            border: 1px solid var(--rich-card-border);
+            background-color: var(--rich-card-bg);
             transition: all 0.2s ease-in-out;
             cursor: pointer;
         }
         .item-card:hover {
-            border-color: #a0aec0;
+            border-color: var(--rich-card-hover-border);
             transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px var(--card-shadow);
         }
         .item-card.selected {
-            border-color: #63b3ed;
-            box-shadow: 0 0 15px rgba(99, 179, 237, 0.5);
+            border-color: var(--rich-card-selected-border);
+            box-shadow: 0 0 15px var(--rich-card-selected-border);
         }
         .comparison-area {
-            background-color: rgba(26, 32, 44, 0.95);
+            background-color: var(--rich-comparison-bg);
             backdrop-filter: blur(10px);
-            border-top: 2px solid #4a5568;
+            border-top: 2px solid var(--rich-comparison-border);
         }
         .stat-highlight {
-            color: #68d391;
+            color: var(--rich-stat-highlight);
             font-weight: 700;
         }
         .stat-dim {
-            color: #a0aec0;
+            color: var(--rich-stat-dim);
         }
         .item-name-gradient-blue {
             background: linear-gradient(to right, #63b3ed, #4299e1);
@@ -68,64 +66,32 @@
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #2d3748;
+            background: var(--rich-card-bg);
         }
         ::-webkit-scrollbar-thumb {
-            background: #4a5568;
+            background: var(--rich-card-border);
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #718096;
+            background: var(--rich-card-hover-border);
         }
-        
-        /* Shared nav styles from index.html, slightly adapted */
-        .top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(26, 32, 44, 0.8); /* bg-gray-900/80 */
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #4a5568; /* border-gray-700 */
-            z-index: 1000;
+        h1 { color: var(--rich-text-slate-100); }
+        header p { color: var(--rich-text-slate-400); }
+        #item-groups h2 { 
+            color: var(--rich-text-slate-100);
+            border-left-color: var(--link-color);
         }
-        .nav-container {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-        }
-        .nav-logo {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #fff;
-            text-decoration: none;
-        }
-        .top-nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 25px;
-        }
-        .top-nav li a {
-            text-decoration: none;
-            color: #e2e8f0; /* text-gray-300 */
-            font-weight: 500;
-            padding-bottom: 5px;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-        .top-nav li a:hover {
-            color: #fff;
-        }
-        .top-nav li a.active-nav-link {
-            color: #63b3ed; /* text-blue-400 */
-            border-bottom-color: #63b3ed;
-            font-weight: bold;
-        }
+        .item-card h3 { color: var(--header-color); }
+        .item-card .text-slate-400 { color: var(--rich-text-slate-400); }
+        .item-card .bg-gray-700\/50 { background-color: var(--rich-bg-gray-700-50); }
+        .item-card .text-blue-300 { color: var(--rich-text-blue-300); }
+        .item-card .border-gray-600 { border-color: var(--rich-card-border); }
+        #comparison-container h3 { color: var(--rich-text-slate-100); }
+        #comparison-table-container .text-slate-400 { color: var(--rich-text-slate-400); }
+        #comparison-table-container .bg-slate-800\/80 { background-color: var(--rich-comparison-bg); }
+        #comparison-table-container .border-gray-600 { border-color: var(--rich-comparison-border); }
+        #comparison-table-container .border-gray-700 { border-color: var(--rich-card-border); }
+        #comparison-table-container .text-slate-300 { color: var(--rich-text-slate-300); }
     </style>
 </head>
 <body class="antialiased">
@@ -135,8 +101,8 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-white mb-2">飾品比較</h1>
-            <p class="text-slate-400">點擊物品卡片以加入或移出比較列表。(資料版本為2025/08/01遊戲市中活動擷取)</p>
+            <h1 class="text-4xl font-bold mb-2">飾品比較</h1>
+            <p>點擊物品卡片以加入或移出比較列表。(資料版本為2025/08/01遊戲市中活動擷取)</p>
         </header>
 
         <main id="item-groups" class="space-y-12 pb-64">
@@ -147,7 +113,7 @@
             <div class="comparison-area max-h-[50vh] overflow-y-auto">
                 <div class="container mx-auto p-4">
                     <div class="flex justify-center items-center mb-4 relative">
-                        <h3 class="text-2xl font-bold text-white">物品比較</h3>
+                        <h3 class="text-2xl font-bold">物品比較</h3>
                         <button id="deselect-all-btn" class="absolute right-0 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg text-sm transition-colors duration-200 hidden">取消全選</button>
                     </div>
                     <div id="comparison-table-container">
@@ -158,8 +124,9 @@
         </footer>
     </div>
 
-<!-- Load the navigation script -->
+<!-- Load Scripts -->
 <script src="nav.js"></script>
+<script src="theme-switcher.js"></script>
 
 <script>
         const rawData = `
@@ -1796,7 +1763,7 @@
 
                 const groupContainer = document.createElement('div');
                 groupContainer.innerHTML = `
-                    <h2 class="text-3xl font-bold mb-6 border-l-4 border-blue-400 pl-4 text-slate-100">${series}系列</h2>
+                    <h2 class="text-3xl font-bold mb-6 border-l-4 pl-4">${series}系列</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         ${itemsInGroup.map(item => renderItemCard(item)).join('')}
                     </div>
@@ -1828,7 +1795,7 @@
                     <div class="flex flex-wrap gap-2 mb-4">
                         ${statsHtml}
                     </div>
-                    <div class="text-xs text-slate-400 mt-auto border-t border-gray-600 pt-2 whitespace-pre-line">${item.description.split('裝備：')[1] || item.description}</div>
+                    <div class="text-xs text-slate-400 mt-auto border-t pt-2 whitespace-pre-line">${item.description.split('裝備：')[1] || item.description}</div>
                 </div>
             `;
         }
@@ -1868,16 +1835,16 @@
             let tableHtml = `
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-gray-600">
-                            <th class="p-2 sticky top-0 bg-slate-800/80 backdrop-blur-sm">屬性</th>
-                            ${selectedItems.map(item => `<th class="p-2 sticky top-0 bg-slate-800/80 backdrop-blur-sm text-center ${getNameGradientClass(item.itemLevel)}">${item.name}</th>`).join('')}
+                        <tr class="border-b">
+                            <th class="p-2 sticky top-0 backdrop-blur-sm">屬性</th>
+                            ${selectedItems.map(item => `<th class="p-2 sticky top-0 backdrop-blur-sm text-center ${getNameGradientClass(item.itemLevel)}">${item.name}</th>`).join('')}
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="border-b border-gray-700"><td class="p-2 font-bold text-slate-400">物品等級</td>${selectedItems.map(item => `<td class="p-2 text-center font-semibold">${item.itemLevel}</td>`).join('')}</tr>
-                        <tr class="border-b border-gray-700"><td class="p-2 font-bold text-slate-400">需要等級</td>${selectedItems.map(item => `<td class="p-2 text-center font-semibold">${item.reqLevel}</td>`).join('')}</tr>
+                        <tr class="border-b"><td class="p-2 font-bold text-slate-400">物品等級</td>${selectedItems.map(item => `<td class="p-2 text-center font-semibold">${item.itemLevel}</td>`).join('')}</tr>
+                        <tr class="border-b"><td class="p-2 font-bold text-slate-400">需要等級</td>${selectedItems.map(item => `<td class="p-2 text-center font-semibold">${item.reqLevel}</td>`).join('')}</tr>
                         ${allStatKeys.map(key => `
-                            <tr class="border-b border-gray-700">
+                            <tr class="border-b">
                                 <td class="p-2 font-bold text-slate-400">${key}</td>
                                 ${selectedItems.map(item => {
                                     const value = item.stats[key] || 0;
@@ -1886,7 +1853,7 @@
                                 }).join('')}
                             </tr>
                         `).join('')}
-                        <tr class="border-b border-gray-700">
+                        <tr class="border-b">
                             <td class="p-2 font-bold text-slate-400 align-top">特殊效果</td>
                             ${selectedItems.map(item => `<td class="p-2 text-xs whitespace-pre-line text-slate-300">${item.description.split('裝備：')[1] || item.description}</td>`).join('')}
                         </tr>
@@ -1909,7 +1876,6 @@
                 }
             }
             
-            // Re-render the specific card to update its style
             const card = document.getElementById(itemId);
             if (card) {
                 card.classList.toggle('selected');
@@ -1920,8 +1886,7 @@
         
         function deselectAllItems() {
             selectedItems = [];
-            const allCards = document.querySelectorAll('.item-card.selected');
-            allCards.forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.item-card.selected').forEach(card => card.classList.remove('selected'));
             renderComparison();
         }
 
