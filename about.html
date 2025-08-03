@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>關於我 - 超級肥肥</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts 的 Inter 字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 自訂字體 */
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+
+    <!-- 主內容卡片 -->
+    <div class="bg-gray-800 w-full max-w-lg p-8 sm:p-10 rounded-2xl shadow-2xl border border-gray-700/50 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-cyan-500/20">
+        
+        <div class="text-center">
+            <!-- 標題 -->
+            <h1 class="text-3xl sm:text-4xl font-bold text-cyan-400 mb-4 tracking-wider">
+                關於我
+            </h1>
+            
+            <!-- 分隔線 -->
+            <div class="w-24 h-1 bg-cyan-400/50 mx-auto rounded-full mb-8"></div>
+
+            <!-- 個人資訊圖示與名稱 -->
+            <div class="flex flex-col items-center mb-6">
+                <!-- 使用 SVG 作為頭像，風格更統一 -->
+                <div class="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center mb-4 border-2 border-cyan-400/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                <p class="text-2xl font-semibold text-white">
+                    超級肥肥
+                </p>
+            </div>
+
+            <!-- 內容文字 -->
+            <p class="text-gray-300 text-lg leading-relaxed">
+                有需要新增甚麼功能請直接遊戲寄信
+            </p>
+        </div>
+
+        <!-- 返回按鈕 (可選) -->
+        <div class="mt-10 text-center">
+            <button class="bg-cyan-500 text-gray-900 font-bold py-3 px-8 rounded-lg hover:bg-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
+                返回首頁
+            </button>
+        </div>
+
+    </div>
+
+</body>
+</html>
