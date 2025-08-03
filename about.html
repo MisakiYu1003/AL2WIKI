@@ -6,57 +6,108 @@
     <title>關於我 - 超級肥肥</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Google Fonts 的 Inter 字體 -->
+    <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* 自訂字體 */
+        /* 自訂字體並為固定的導覽列增加頂部空間 */
         body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            font-family: 'Noto Sans TC', sans-serif;
+            padding-top: 80px;
+        }
+        
+        /* 導覽列樣式 (與 rich.html 保持一致以確保風格統一) */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(26, 32, 44, 0.8); /* bg-gray-900/80 */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #4a5568; /* border-gray-700 */
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+        .nav-logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+        }
+        .top-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 25px;
+        }
+        .top-nav li a {
+            text-decoration: none;
+            color: #e2e8f0; /* text-gray-300 */
+            font-weight: 500;
+            padding-bottom: 5px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .top-nav li a:hover {
+            color: #fff;
+        }
+        .top-nav li a.active-nav-link {
+            color: #63b3ed; /* text-blue-400 */
+            border-bottom-color: #63b3ed;
+            font-weight: bold;
         }
     </style>
 </head>
 <body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
 
-    <!-- 主內容卡片 -->
-    <div class="bg-gray-800 w-full max-w-lg p-8 sm:p-10 rounded-2xl shadow-2xl border border-gray-700/50 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-cyan-500/20">
+<!-- 導覽列的容器 -->
+<div id="nav-placeholder"></div>
+
+<!-- 主內容卡片 -->
+<div class="bg-gray-800 w-full max-w-lg p-8 sm:p-10 rounded-2xl shadow-2xl border border-gray-700/50 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-cyan-500/20">
+    
+    <div class="text-center">
+        <!-- 標題 -->
+        <h1 class="text-3xl sm:text-4xl font-bold text-cyan-400 mb-4 tracking-wider">
+            關於我
+        </h1>
         
-        <div class="text-center">
-            <!-- 標題 -->
-            <h1 class="text-3xl sm:text-4xl font-bold text-cyan-400 mb-4 tracking-wider">
-                關於我
-            </h1>
-            
-            <!-- 分隔線 -->
-            <div class="w-24 h-1 bg-cyan-400/50 mx-auto rounded-full mb-8"></div>
+        <!-- 分隔線 -->
+        <div class="w-24 h-1 bg-cyan-400/50 mx-auto rounded-full mb-8"></div>
 
-            <!-- 個人資訊圖示與名稱 -->
-            <div class="flex flex-col items-center mb-6">
-                <!-- 使用 SVG 作為頭像，風格更統一 -->
-                
-                <p class="text-2xl font-semibold text-white">
-                    超級肥肥
-                </p>
-            </div>
-
-            <!-- 內容文字 -->
-            <p class="text-gray-300 text-lg leading-relaxed">
-                有需要新增甚麼功能請直接遊戲寄信
+        <!-- 個人資訊 -->
+        <div class="flex flex-col items-center mb-6">
+            <p class="text-2xl font-semibold text-white">
+                超級肥肥
             </p>
         </div>
 
-        <!-- 返回按鈕 (可選) -->
-        <a href="index.html">
-        <div class="mt-10 text-center">
-            <button class="bg-cyan-500 text-gray-900 font-bold py-3 px-8 rounded-lg hover:bg-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
-                返回首頁
-            </button>
-        </div>
-
+        <!-- 內容文字 -->
+        <p class="text-gray-300 text-lg leading-relaxed">
+            有需要新增甚麼功能請直接遊戲寄信
+        </p>
     </div>
+
+    <!-- 返回按鈕 -->
+    <div class="mt-10 text-center">
+        <a href="index.html" class="bg-cyan-500 text-gray-900 font-bold py-3 px-8 rounded-lg hover:bg-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all duration-300 shadow-lg hover:shadow-xl">
+            返回首頁
+        </a>
+    </div>
+
+</div>
+
+<!-- 載入導覽列腳本 -->
+<script src="nav.js"></script>
 
 </body>
 </html>
-
-
