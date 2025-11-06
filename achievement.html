@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天使之戀2成就查詢</title>
+<link rel="stylesheet" href="shared-styles.css">
+<link rel="icon" href="al2favicon.ico" type="image/x-icon">
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="container">
+  <h1>天使之戀2成就查詢</h1>
+  <p>
+    <input type="file" id="fileInput" accept=".xml" style="display:none;">
+    <button id="reloadButton">重新載入檔案</button>
+    <code>ACHIEVEMENT.XML</code>
+  </p>
+
+  <div class="filters">
+    <input id="kw" type="text" placeholder="關鍵字搜尋">
+    <select id="cat"><option>全部</option></select>
+    <select id="subcat"><option>全部</option></select>
+    <select id="diff"><option>全部</option></select>
+    <select id="visible"><option>全部</option></select>
+    <span class="stat" id="stat">尚未載入</span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead><tr id="theadRow"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <details style="margin-top:8px">
+    <summary>原始 XML</summary>
+    <pre id="raw" style="white-space:pre-wrap;font-size:12px;max-height:200px;overflow:auto;color:#8ea0be"></pre>
+  </details>
+
+  <div class="footer">Made for offline use</div>
+</div>
+<script src="nav.js"></script>
+<script>
+(() => {
+  const kw=document.getElementById('kw'),cat=document.getElementById('cat'),subcat=document.getElementById('subcat'),diff=document.getElementById('diff'),visible=document.getElementById('visible'),stat=document.getElementById('stat'),theadRow=document.getElementById('theadRow'),tbody=document.getElementById('tbody'),raw=document.getElementById('raw'),fileInput=document.getElementById('fileInput'),reloadButton=document.getElementById('reloadButton');
+  let rows=[],sortKey="編號",sortAsc=true;
+
+  const columns=[["編號",60],["主類別",90],["次類別",90],["名稱",160],["稱號",120],["難度",60],["顯示",80],["達成條件",260],["附加能力",200]];
+
+  function parseXMLText(text){
+    const parser=new DOMParser(),doc=parser.parseFromString(text,"application/xml");
+    if(doc.querySelector("parsererror")) throw new Error("XML 解析失敗");
+    const nodes=[...doc.querySelectorAll("achievement")];
+    return nodes.map(el=>{
+      const obj={};for(const attr of el.attributes)obj[attr.name]=attr.value;
+      const ruleGroups={};
+      for(const[k,v]of Object.entries(obj)){const m=k.match(/^規則(\d+)(類別|參數(\d+))$/);if(m){const idx=m[1];ruleGroups[idx]=ruleGroups[idx]||{類別:"",參數:{}};if(m[2]==="類別")ruleGroups[idx].類別=v;if(m[3])ruleGroups[idx].參數[m[3]]=v}}
+      const ruleEntries=Object.entries(ruleGroups).map(([i,r])=>({索引:+i,類別:r.類別,參數:Object.keys(r.參數).sort((a,b)=>a-b).map(k=>r.參數[k])})).sort((a,b)=>a.索引-b.索引);
+      const bonusGroups={};
+      for(const[k,v]of Object.entries(obj)){let m=k.match(/^附加能力(\d*)種類$/);if(m){const idx=m[1]||"1";bonusGroups[idx]=bonusGroups[idx]||{};bonusGroups[idx].種類=v}m=k.match(/^附加能力(\d*)數值$/);if(m){const idx=m[1]||"1";bonusGroups[idx]=bonusGroups[idx]||{};bonusGroups[idx].數值=v}}
+      const bonusEntries=Object.entries(bonusGroups).map(([i,b])=>({索引:+i,種類:b.種類,數值:b.數值})).sort((a,b)=>a.索引-b.索引);
+      return {...obj,_規則:ruleEntries,_附加能力:bonusEntries};
+    });
+  }
+
+  function renderHeader(){
+    theadRow.innerHTML="";columns.forEach(([key,w])=>{const th=document.createElement('th');th.style.minWidth=w+'px';const btn=document.createElement('button');btn.textContent=key+(sortKey===key?(sortAsc?" ▲":" ▼"):"");btn.style.background="none";btn.style.color="inherit";btn.style.border="0";btn.style.cursor="pointer";btn.onclick=()=>{if(sortKey===key)sortAsc=!sortAsc;else{sortKey=key;sortAsc=true}update()};th.appendChild(btn);theadRow.appendChild(th)});
+  }
+
+  function update(){
+    renderHeader();let data=[...rows];
+    if(cat.value!=="全部")data=data.filter(r=>r["主類別"]===cat.value);
+    if(subcat.value!=="全部")data=data.filter(r=>r["次類別"]===subcat.value);
+    if(diff.value!=="全部")data=data.filter(r=>r["難度"]===diff.value);
+    if(visible.value!=="全部")data=data.filter(r=>r["顯示"]===visible.value);
+    const k=kw.value.trim();if(k)data=data.filter(r=>["編號","名稱","稱號","說明","主類別","次類別"].some(x=>(r[x]||"").includes(k))||r._規則.some(x=>x.類別.includes(k)||x.參數.join(",").includes(k))||r._附加能力.some(x=>(x.種類||"").includes(k)));
+    data.sort((a,b)=>{const va=a[sortKey],vb=b[sortKey];const na=+va,nb=+vb;let cmp;cmp=(!isNaN(na)&&!isNaN(nb))?na-nb:String(va||"").localeCompare(String(vb||""),"zh-Hant");return sortAsc?cmp:-cmp});
+    stat.textContent=`已載入 ${rows.length} 筆；符合 ${data.length} 筆`;
+    tbody.innerHTML="";
+    data.forEach(r=>{const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${r["編號"]||""}</td><td>${r["主類別"]||""}</td><td>${r["次類別"]||""}</td><td><strong>${r["名稱"]||""}</strong></td><td class="muted">${r["稱號"]||"—"}</td><td>${r["難度"]||""}</td><td>${r["顯示"]||""}</td><td class="muted">${r["說明"]||""}</td><td data-cell="附加能力"></td><td data-cell="規則"></td>`;
+      const bc=tr.querySelector('[data-cell="附加能力"]');if(r._附加能力.length && r._附加能力[0].種類){bc.textContent=r._附加能力.map(x=>(x.種類||"?")+" + "+(x.數值||0)).join("  ");}else bc.innerHTML='<span class="muted">—</span>';
+      tbody.appendChild(tr)});
+    function setOpts(sel,vals){const cur=sel.value;sel.innerHTML="<option>全部</option>"+vals.map(v=>`<option>${v}</option>`).join("");if([...sel.options].some(o=>o.value===cur))sel.value=cur}
+    setOpts(cat,[...new Set(rows.map(r=>r["主類別"]).filter(Boolean))]);setOpts(subcat,[...new Set(rows.map(r=>r["次類別"]).filter(Boolean))]);setOpts(diff,[...new Set(rows.map(r=>r["難度"]).filter(Boolean))]);setOpts(visible,[...new Set(rows.map(r=>r["顯示"]).filter(Boolean))]);
+  }
+
+  async function loadFile(file){
+    try{
+      let text;
+      if(file){text=await file.text()}
+      else{const res=await fetch('ACHIEVEMENT.XML');if(!res.ok)throw new Error(res.statusText);text=await res.text()}
+      raw.textContent=text;
+      rows=parseXMLText(text);
+      update();
+    }catch(e){
+      stat.textContent="無法載入檔案："+e.message;
+      tbody.innerHTML = `<tr><td colspan="${columns.length}" style="text-align:center;padding:20px;">無法載入成就檔案 (ACHIEVEMENT.XML)。請確認檔案存在，或手動選擇檔案。</td></tr>`;
+    }
+  }
+  
+  reloadButton.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => {
+    if(e.target.files.length) loadFile(e.target.files[0]);
+  });
+  
+  [kw,cat,subcat,diff,visible].forEach(el=>el.addEventListener('input',update));
+  renderHeader();
+  loadFile();
+})();
+</script>
+</body>
+</html>
