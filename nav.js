@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const backToHomeBtn = document.createElement('a');
     backToHomeBtn.id = 'back-to-home-btn';
     backToHomeBtn.href = 'index.html';
-    backToHomeBtn.innerHTML = '首'; // Home character
+    backToHomeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'; // Home icon
     document.body.appendChild(backToHomeBtn);
 
     window.addEventListener('scroll', () => {
