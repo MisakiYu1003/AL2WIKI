@@ -7,22 +7,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const navBarHTML = `
         <nav class="top-nav">
             <div class="nav-container">
-                <a href="index.html" class="nav-logo">天使之戀找怪</a>
+                <a href="index.html" class="nav-logo">天使之戀2-WIKI</a>
                 <button id="hamburger-btn" aria-label="Toggle Navigation">
                     <span></span>
                     <span></span>
                     <span></span>
                 </button>
                 <ul id="main-nav-links">
-                    <li><a href="index.html" class="nav-link">怪物篩選器</a></li>
                     <li class="dropdown">
-                        <a href="#" class="nav-link dropdown-toggle">多國語言</a>
+                        <a href="searchmomTw.html" class="nav-link dropdown-toggle">怪物篩選器</a>
                         <ul class="dropdown-menu">
-                            <li><a href="Japanese.html">Japanese (日語版)</a></li>
-                            <li><a href="English.html">English (英語版)</a></li>
+                            <li><a href="searchmomTw.html">繁中版</a></li>
+                            <li><a href="searchmomJa.html">日語版</a></li>
+                            <li><a href="searchmomEn.html">英語版</a></li>
                         </ul>
                     </li>
                     <li><a href="rich.html" class="nav-link">飾品數值</a></li>
+                    <li><a href="aa.html" class="nav-link">寵物技能</a></li>
+					<li><a href="achievement.html" class="nav-link">成就查詢</a></li>
                     <li><a href="about.html" class="nav-link">關於我</a></li>
                 </ul>
             </div>
@@ -116,5 +118,26 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.toggle('dark-mode');
         let theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
         localStorage.setItem('theme', theme);
+    });
+
+    // --- 4. Back to Top Button Logic ---
+    const backToTopBtn = document.createElement('button');
+    backToTopBtn.id = 'back-to-top-btn';
+    backToTopBtn.innerHTML = '&uarr;'; // Up arrow
+    document.body.appendChild(backToTopBtn);
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 200) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
 });
