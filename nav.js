@@ -140,4 +140,19 @@ document.addEventListener("DOMContentLoaded", () => {
             behavior: 'smooth'
         });
     });
+
+    // --- 5. Back to Home Button Logic ---
+    const backToHomeBtn = document.createElement('a');
+    backToHomeBtn.id = 'back-to-home-btn';
+    backToHomeBtn.href = 'index.html';
+    backToHomeBtn.innerHTML = '首'; // Home character
+    document.body.appendChild(backToHomeBtn);
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 200) {
+            backToHomeBtn.classList.add('show');
+        } else {
+            backToHomeBtn.classList.remove('show');
+        }
+    });
 });
