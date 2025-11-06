@@ -103,6 +103,13 @@
         <header class="text-center mb-8">
             <h1 class="text-4xl font-bold mb-2">飾品比較</h1>
             <p>點擊物品卡片以加入或移出比較列表。(資料版本為2025/08/01遊戲市中活動擷取)</p>
+            <div class="mt-4 max-w-lg mx-auto">
+                <div class="flex">
+                    <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋飾品名稱或敘述..." style="color: black;">
+                    <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2">搜尋</button>
+                    <button id="clearButton" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-r-lg">清除</button>
+                </div>
+            </div>
         </header>
 
         <main id="item-groups" class="space-y-12 pb-64">
@@ -1898,6 +1905,47 @@
             renderComparison();
             
             document.getElementById('deselect-all-btn').addEventListener('click', deselectAllItems);
+
+            const searchButton = document.getElementById('searchButton');
+            const searchInput = document.getElementById('searchInput');
+            const clearButton = document.getElementById('clearButton');
+
+            function filterItems() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const itemCards = document.querySelectorAll('.item-card');
+
+                itemCards.forEach(card => {
+                    const itemName = card.querySelector('h3').textContent.toLowerCase();
+                    const itemDescription = card.querySelector('.text-xs.text-slate-400').textContent.toLowerCase();
+                    
+                    const matches = itemName.includes(searchTerm) || itemDescription.includes(searchTerm);
+                    
+                    if (matches) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            function showAllItems() {
+                const itemCards = document.querySelectorAll('.item-card');
+                itemCards.forEach(card => {
+                    card.style.display = '';
+                });
+            }
+
+            searchButton.addEventListener('click', filterItems);
+            searchInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    filterItems();
+                }
+            });
+
+            clearButton.addEventListener('click', () => {
+                searchInput.value = '';
+                showAllItems();
+            });
         });
     </script>
 
