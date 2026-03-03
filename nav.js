@@ -2,13 +2,13 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     // --- 1. 導覽列邏輯 ---
-    
+
     // 定義導覽列的 HTML，包含漢堡按鈕和下拉式選單
     const navBarHTML = `
         <nav class="top-nav">
             <div class="nav-container">
                 <a href="index.html" class="nav-logo">天使之戀2-WIKI</a>
-                <button id="hamburger-btn" aria-label="Toggle Navigation">
+                <button id="hamburger-btn" aria-label="Toggle Navigation" aria-expanded="false" aria-controls="main-nav-links">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
         const currentPage = window.location.pathname.split("/").pop() || 'index.html';
         const navLinks = document.querySelectorAll('#main-nav-links > li > .nav-link');
-        
+
         navLinks.forEach(link => {
             const linkPage = link.getAttribute('href').split("/").pop();
             if (linkPage === currentPage) {
@@ -62,10 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (hamburgerBtn && mainNavLinks) {
         hamburgerBtn.addEventListener('click', () => {
             // 切換漢堡選單的開啟/關閉狀態
-            document.querySelector('.top-nav').classList.toggle('nav-open');
+            const isOpened = document.querySelector('.top-nav').classList.toggle('nav-open');
+            hamburgerBtn.setAttribute('aria-expanded', isOpened);
         });
     }
-    
+
     if(dropdownToggle) {
         dropdownToggle.addEventListener('click', (e) => {
             // 在小螢幕上，點擊連結時防止頁面跳轉，並展開子選單
@@ -78,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 3. 主題切換開關邏輯 ---
-    
+
     const navContainer = document.querySelector('.nav-container');
     if (!navContainer) {
         console.error('找不到導覽列容器以放置主題開關!');
@@ -94,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.id = 'theme-toggle';
+    checkbox.setAttribute('aria-label', '切換深淺色模式');
     const slider = document.createElement('span');
     slider.className = 'slider round';
 
@@ -123,7 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 4. Back to Top Button Logic ---
     const backToTopBtn = document.createElement('button');
     backToTopBtn.id = 'back-to-top-btn';
-    backToTopBtn.innerHTML = '&uarr;'; // Up arrow
+    backToTopBtn.setAttribute('aria-label', '回到頂端');
+    backToTopBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>';
     document.body.appendChild(backToTopBtn);
 
     window.addEventListener('scroll', () => {
@@ -142,17 +145,33 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // --- 5. Back to Home Button Logic ---
-    const backToHomeBtn = document.createElement('a');
-    backToHomeBtn.id = 'back-to-home-btn';
-    backToHomeBtn.href = 'index.html';
-    backToHomeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'; // Home icon
-    document.body.appendChild(backToHomeBtn);
+    const isHomePage = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/') || window.location.pathname === '';
+    if (!isHomePage) {
+        const backToHomeBtn = document.createElement('a');
+        backToHomeBtn.id = 'back-to-home-btn';
+        backToHomeBtn.href = 'index.html';
+        backToHomeBtn.setAttribute('aria-label', '回到首頁');
+        backToHomeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'; // Home icon
+        document.body.appendChild(backToHomeBtn);
 
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 200) {
-            backToHomeBtn.classList.add('show');
-        } else {
-            backToHomeBtn.classList.remove('show');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) {
+                backToHomeBtn.classList.add('show');
+            } else {
+                backToHomeBtn.classList.remove('show');
+            }
+        });
+    }
+
+    // --- 6. Global Keyboard Shortcut for Search ---
+    document.addEventListener('keydown', (e) => {
+        // Press '/' to focus search input, if not already focusing an input
+        if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+            const searchInput = document.getElementById('searchInput') || document.getElementById('kw');
+            if (searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+            }
         }
     });
 });
