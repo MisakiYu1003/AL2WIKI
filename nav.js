@@ -126,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const backToTopBtn = document.createElement('button');
     backToTopBtn.id = 'back-to-top-btn';
     backToTopBtn.setAttribute('aria-label', '回到頂端');
+    backToTopBtn.title = '回到頂端';
     backToTopBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>';
     document.body.appendChild(backToTopBtn);
 
@@ -151,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         backToHomeBtn.id = 'back-to-home-btn';
         backToHomeBtn.href = 'index.html';
         backToHomeBtn.setAttribute('aria-label', '回到首頁');
+        backToHomeBtn.title = '回到首頁';
         backToHomeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'; // Home icon
         document.body.appendChild(backToHomeBtn);
 
@@ -164,6 +166,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 6. Global Keyboard Shortcut for Search ---
+    const searchInput = document.getElementById('searchInput') || document.getElementById('kw');
+    if (searchInput) {
+        // Append shortcut hint to placeholder if it doesn't have one
+        const currentPlaceholder = searchInput.getAttribute('placeholder');
+        if (currentPlaceholder && !currentPlaceholder.includes('( / )')) {
+            searchInput.setAttribute('placeholder', `${currentPlaceholder} ( / )`);
+        }
+    }
+
     document.addEventListener('keydown', (e) => {
         // Press '/' to focus search input, if not already focusing an input
         if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {

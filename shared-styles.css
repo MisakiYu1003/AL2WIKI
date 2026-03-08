@@ -65,10 +65,12 @@
     --about-button-bg: #63b3ed;
     --about-button-text: #1a202c;
     --about-button-hover-bg: #90cdf4;
+    --input-text-color: #f7fafc;
 }
 
 .dark-mode {
     /* 亮色模式 */
+    --input-text-color: #1a202c;
     --bg-color: #f8f9fa;
     --text-color: #212529;
     --nav-bg: rgba(255, 255, 255, 0.8);
@@ -453,4 +455,15 @@ input:checked + .slider:before {
 
 #back-to-top-btn:hover, #back-to-home-btn:hover {
     opacity: 1;
+}
+
+/* Focus visibility for keyboard navigation */
+:focus-visible {
+    outline: 2px solid var(--link-color);
+    outline-offset: 2px;
+}
+
+/* General Input Styles */
+input[type="text"], input[type="search"], select, textarea {
+    color: var(--input-text-color);
 }
