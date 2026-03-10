@@ -77,7 +77,7 @@
         }
         h1 { color: var(--rich-text-slate-100); }
         header p { color: var(--rich-text-slate-400); }
-        #item-groups h2 { 
+        #item-groups h2 {
             color: var(--rich-text-slate-100);
             border-left-color: var(--link-color);
         }
@@ -105,7 +105,7 @@
             <p>點擊物品卡片以加入或移出比較列表。(資料版本為2025/08/01遊戲市中活動擷取)</p>
             <div class="mt-4 max-w-lg mx-auto">
                 <div class="flex">
-                    <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋飾品名稱或敘述..." style="color: black;">
+                    <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋飾品名稱或敘述... (按 / 搜尋)" style="color: black;">
                     <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2">搜尋</button>
                     <button id="clearButton" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-r-lg">清除</button>
                 </div>
@@ -133,7 +133,6 @@
 
 <!-- Load Scripts -->
 <script src="nav.js"></script>
-<script src="theme-switcher.js"></script>
 
 <script>
         const rawData = `
@@ -1694,7 +1693,7 @@
                 const item = { id: `item-${index}` };
                 item.name = lines[0].trim();
                 item.type = lines[1].trim();
-                
+
                 // Parse stats
                 item.stats = {};
                 const statsLine = lines[2];
@@ -1731,7 +1730,7 @@
 
                 return item;
             }).filter(item => item && item.name); // Filter out any null or invalid items
-            
+
             // Deduplicate items based on name
             const uniqueItems = [];
             const names = new Set();
@@ -1757,7 +1756,7 @@
                 (acc[item.series] = acc[item.series] || []).push(item);
                 return acc;
             }, {});
-            
+
             // Sort groups by highest item level within the group
             const sortedGroupKeys = Object.keys(groupedItems).sort((a, b) => {
                 const maxLevelA = Math.max(...groupedItems[a].map(i => i.itemLevel));
@@ -1779,7 +1778,7 @@
                 container.appendChild(groupContainer);
             }
         }
-        
+
         function getNameGradientClass(itemLevel) {
             if (itemLevel >= 300) return 'item-name-gradient-gold';
             if (itemLevel >= 280) return 'item-name-gradient-purple';
@@ -1794,7 +1793,7 @@
                 .join('');
 
             return `
-                <div id="${item.id}" class="item-card rounded-lg p-4 flex flex-col ${isSelected ? 'selected' : ''}" onclick="toggleItemSelection('${item.id}')">
+                <div id="${item.id}" class="item-card rounded-lg p-4 flex flex-col ${isSelected ? "selected" : ""}" onclick="toggleItemSelection('${item.id}')" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleItemSelection('${item.id}'); }" tabindex="0" role="button" aria-pressed="${isSelected}">
                     <h3 class="text-xl font-bold mb-2 ${getNameGradientClass(item.itemLevel)}">${item.name}</h3>
                     <div class="text-xs text-slate-400 mb-3 space-x-4">
                         <span>物品等級: ${item.itemLevel}</span>
@@ -1819,7 +1818,7 @@
                 tableContainer.innerHTML = '<p class="text-center text-slate-400">請至少選擇一件物品進行比較。</p>';
                 return;
             }
-            
+
             container.classList.remove('translate-y-full');
             deselectBtn.classList.remove('hidden');
 
@@ -1839,7 +1838,7 @@
             allStatKeys.forEach(key => {
                 maxValues[key] = Math.max(...selectedItems.map(item => item.stats[key] || 0));
             });
-            
+
             let tableHtml = `
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -1875,23 +1874,26 @@
         // --- EVENT HANDLING ---
         function toggleItemSelection(itemId) {
             const itemIndex = selectedItems.findIndex(item => item.id === itemId);
+            const card = document.getElementById(itemId);
+
             if (itemIndex > -1) {
                 selectedItems.splice(itemIndex, 1);
+                if (card) card.setAttribute('aria-pressed', 'false');
             } else {
                 const itemToAdd = allItems.find(item => item.id === itemId);
                 if (itemToAdd) {
                     selectedItems.push(itemToAdd);
+                    if (card) card.setAttribute('aria-pressed', 'true');
                 }
             }
-            
-            const card = document.getElementById(itemId);
+
             if (card) {
                 card.classList.toggle('selected');
             }
 
             renderComparison();
         }
-        
+
         function deselectAllItems() {
             selectedItems = [];
             document.querySelectorAll('.item-card.selected').forEach(card => card.classList.remove('selected'));
@@ -1903,7 +1905,7 @@
             allItems = parseRawData(rawData);
             renderItems();
             renderComparison();
-            
+
             document.getElementById('deselect-all-btn').addEventListener('click', deselectAllItems);
 
             const searchButton = document.getElementById('searchButton');
@@ -1917,9 +1919,9 @@
                 itemCards.forEach(card => {
                     const itemName = card.querySelector('h3').textContent.toLowerCase();
                     const itemDescription = card.querySelector('.text-xs.text-slate-400').textContent.toLowerCase();
-                    
+
                     const matches = itemName.includes(searchTerm) || itemDescription.includes(searchTerm);
-                    
+
                     if (matches) {
                         card.style.display = '';
                     } else {
