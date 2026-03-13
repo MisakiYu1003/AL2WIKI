@@ -53,6 +53,9 @@
     <div id="pet-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- 寵物資料將由 JavaScript 動態載入 -->
     </div>
+    <div id="no-results" class="text-center py-12 hidden">
+        <p class="text-2xl text-slate-400">找不到符合條件的寵物或技能。</p>
+    </div>
 </div>
 
 <script>
@@ -6074,6 +6077,8 @@ document.addEventListener("DOMContentLoaded", () => {
         petCards.forEach(card => {
             card.style.display = '';
         });
+        document.getElementById('no-results').classList.add('hidden');
+        document.getElementById('pet-list').classList.remove('hidden');
     }
 
     function filterPets() {
@@ -6083,6 +6088,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         const petCards = document.querySelectorAll('.pet-card');
+        const noResults = document.getElementById('no-results');
+        let visibleCount = 0;
 
         petCards.forEach(card => {
             const petName = card.querySelector('h2').textContent.toLowerCase();
@@ -6092,10 +6099,19 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (matches) {
                 card.style.display = '';
+                visibleCount++;
             } else {
                 card.style.display = 'none';
             }
         });
+
+        if (visibleCount === 0) {
+            noResults.classList.remove('hidden');
+            document.getElementById('pet-list').classList.add('hidden');
+        } else {
+            noResults.classList.add('hidden');
+            document.getElementById('pet-list').classList.remove('hidden');
+        }
     }
 
     searchButton.addEventListener('click', filterPets);

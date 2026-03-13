@@ -164,6 +164,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 6. Global Keyboard Shortcut for Search ---
+    const searchInputEl = document.getElementById('searchInput') || document.getElementById('kw');
+    if (searchInputEl && searchInputEl.placeholder && !searchInputEl.placeholder.includes('/')) {
+        searchInputEl.placeholder += ' (按 / 搜尋)';
+    }
+
     document.addEventListener('keydown', (e) => {
         // Press '/' to focus search input, if not already focusing an input
         if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
