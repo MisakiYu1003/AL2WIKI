@@ -29,6 +29,10 @@
             border-color: var(--rich-card-selected-border);
             box-shadow: 0 0 15px var(--rich-card-selected-border);
         }
+        .item-card:focus-visible {
+            outline: 3px solid var(--rich-card-selected-border);
+            outline-offset: 2px;
+        }
         .comparison-area {
             background-color: var(--rich-comparison-bg);
             backdrop-filter: blur(10px);
@@ -77,7 +81,7 @@
         }
         h1 { color: var(--rich-text-slate-100); }
         header p { color: var(--rich-text-slate-400); }
-        #item-groups h2 { 
+        #item-groups h2 {
             color: var(--rich-text-slate-100);
             border-left-color: var(--link-color);
         }
@@ -1694,7 +1698,7 @@
                 const item = { id: `item-${index}` };
                 item.name = lines[0].trim();
                 item.type = lines[1].trim();
-                
+
                 // Parse stats
                 item.stats = {};
                 const statsLine = lines[2];
@@ -1731,7 +1735,7 @@
 
                 return item;
             }).filter(item => item && item.name); // Filter out any null or invalid items
-            
+
             // Deduplicate items based on name
             const uniqueItems = [];
             const names = new Set();
@@ -1757,7 +1761,7 @@
                 (acc[item.series] = acc[item.series] || []).push(item);
                 return acc;
             }, {});
-            
+
             // Sort groups by highest item level within the group
             const sortedGroupKeys = Object.keys(groupedItems).sort((a, b) => {
                 const maxLevelA = Math.max(...groupedItems[a].map(i => i.itemLevel));
@@ -1779,7 +1783,7 @@
                 container.appendChild(groupContainer);
             }
         }
-        
+
         function getNameGradientClass(itemLevel) {
             if (itemLevel >= 300) return 'item-name-gradient-gold';
             if (itemLevel >= 280) return 'item-name-gradient-purple';
@@ -1794,7 +1798,8 @@
                 .join('');
 
             return `
-                <div id="${item.id}" class="item-card rounded-lg p-4 flex flex-col ${isSelected ? 'selected' : ''}" onclick="toggleItemSelection('${item.id}')">
+                <div id="${item.id}" class="item-card rounded-lg p-4 flex flex-col ${isSelected ? 'selected' : ''}"
+                     onclick="toggleItemSelection('${item.id}')" tabindex="0" role="button" aria-pressed="${isSelected}">
                     <h3 class="text-xl font-bold mb-2 ${getNameGradientClass(item.itemLevel)}">${item.name}</h3>
                     <div class="text-xs text-slate-400 mb-3 space-x-4">
                         <span>物品等級: ${item.itemLevel}</span>
@@ -1819,7 +1824,7 @@
                 tableContainer.innerHTML = '<p class="text-center text-slate-400">請至少選擇一件物品進行比較。</p>';
                 return;
             }
-            
+
             container.classList.remove('translate-y-full');
             deselectBtn.classList.remove('hidden');
 
@@ -1839,7 +1844,7 @@
             allStatKeys.forEach(key => {
                 maxValues[key] = Math.max(...selectedItems.map(item => item.stats[key] || 0));
             });
-            
+
             let tableHtml = `
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -1883,15 +1888,16 @@
                     selectedItems.push(itemToAdd);
                 }
             }
-            
+
             const card = document.getElementById(itemId);
             if (card) {
-                card.classList.toggle('selected');
+                const isNowSelected = card.classList.toggle('selected');
+                card.setAttribute('aria-pressed', isNowSelected);
             }
 
             renderComparison();
         }
-        
+
         function deselectAllItems() {
             selectedItems = [];
             document.querySelectorAll('.item-card.selected').forEach(card => card.classList.remove('selected'));
@@ -1903,8 +1909,19 @@
             allItems = parseRawData(rawData);
             renderItems();
             renderComparison();
-            
+
             document.getElementById('deselect-all-btn').addEventListener('click', deselectAllItems);
+
+            // Global keyboard listener for item cards
+            if (!window._kbListenerAdded) {
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('item-card')) {
+                        e.preventDefault();
+                        toggleItemSelection(e.target.id);
+                    }
+                });
+                window._kbListenerAdded = 'true';
+            }
 
             const searchButton = document.getElementById('searchButton');
             const searchInput = document.getElementById('searchInput');
@@ -1917,9 +1934,9 @@
                 itemCards.forEach(card => {
                     const itemName = card.querySelector('h3').textContent.toLowerCase();
                     const itemDescription = card.querySelector('.text-xs.text-slate-400').textContent.toLowerCase();
-                    
+
                     const matches = itemName.includes(searchTerm) || itemDescription.includes(searchTerm);
-                    
+
                     if (matches) {
                         card.style.display = '';
                     } else {
