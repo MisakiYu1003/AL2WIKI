@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <li><a href="searchmomEn.html">英語版</a></li>
                         </ul>
                     </li>
+                    <li><a href="news.html" class="nav-link">最新佈告</a></li>
                     <li><a href="rich.html" class="nav-link">飾品數值</a></li>
                     <li><a href="aa.html" class="nav-link">寵物技能</a></li>
 					<li><a href="achievement.html" class="nav-link">成就查詢</a></li>
