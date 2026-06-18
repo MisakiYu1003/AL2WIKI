@@ -81,7 +81,7 @@
         }
         h1 { color: var(--rich-text-slate-100); }
         header p { color: var(--rich-text-slate-400); }
-        #item-groups h2 { 
+        #item-groups h2 {
             color: var(--rich-text-slate-100);
             border-left-color: var(--link-color);
         }
@@ -109,9 +109,9 @@
             <p>點擊物品卡片以加入或移出比較列表。(資料版本為2025/08/01遊戲市中活動擷取)</p>
             <div class="mt-4 max-w-lg mx-auto">
                 <div class="flex">
-                    <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋飾品名稱或敘述... (按 / 搜尋)" style="color: black;">
-                    <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2">搜尋</button>
-                    <button id="clearButton" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-r-lg">清除</button>
+                    <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋飾品名稱或敘述... (按 / 搜尋)" aria-label="搜尋飾品" style="color: black;">
+                    <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2" aria-label="執行搜尋">搜尋</button>
+                    <button id="clearButton" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-r-lg" aria-label="清除搜尋內容">清除</button>
                 </div>
             </div>
         </header>
@@ -119,6 +119,9 @@
         <main id="item-groups" class="space-y-12 pb-64">
             <!-- Item groups will be injected here by JavaScript -->
         </main>
+        <div id="no-results" class="text-center py-12 text-slate-400 hidden">
+            找不到符合的飾品。
+        </div>
 
         <footer id="comparison-container" class="fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 ease-in-out translate-y-full">
             <div class="comparison-area max-h-[50vh] overflow-y-auto">
@@ -1697,7 +1700,7 @@
                 const item = { id: `item-${index}` };
                 item.name = lines[0].trim();
                 item.type = lines[1].trim();
-                
+
                 // Parse stats
                 item.stats = {};
                 const statsLine = lines[2];
@@ -1734,7 +1737,7 @@
 
                 return item;
             }).filter(item => item && item.name); // Filter out any null or invalid items
-            
+
             // Deduplicate items based on name
             const uniqueItems = [];
             const names = new Set();
@@ -1760,7 +1763,7 @@
                 (acc[item.series] = acc[item.series] || []).push(item);
                 return acc;
             }, {});
-            
+
             // Sort groups by highest item level within the group
             const sortedGroupKeys = Object.keys(groupedItems).sort((a, b) => {
                 const maxLevelA = Math.max(...groupedItems[a].map(i => i.itemLevel));
@@ -1782,7 +1785,7 @@
                 container.appendChild(groupContainer);
             }
         }
-        
+
         function getNameGradientClass(itemLevel) {
             if (itemLevel >= 300) return 'item-name-gradient-gold';
             if (itemLevel >= 280) return 'item-name-gradient-purple';
@@ -1822,7 +1825,7 @@
                 tableContainer.innerHTML = '<p class="text-center text-slate-400">請至少選擇一件物品進行比較。</p>';
                 return;
             }
-            
+
             container.classList.remove('translate-y-full');
             deselectBtn.classList.remove('hidden');
 
@@ -1842,7 +1845,7 @@
             allStatKeys.forEach(key => {
                 maxValues[key] = Math.max(...selectedItems.map(item => item.stats[key] || 0));
             });
-            
+
             let tableHtml = `
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -1886,7 +1889,7 @@
                     selectedItems.push(itemToAdd);
                 }
             }
-            
+
             const card = document.getElementById(itemId);
             if (card) {
                 const isSelected = card.classList.toggle('selected');
@@ -1895,7 +1898,7 @@
 
             renderComparison();
         }
-        
+
         function deselectAllItems() {
             selectedItems = [];
             document.querySelectorAll('.item-card.selected').forEach(card => card.classList.remove('selected'));
@@ -1907,7 +1910,7 @@
             allItems = parseRawData(rawData);
             renderItems();
             renderComparison();
-            
+
             document.getElementById('deselect-all-btn').addEventListener('click', deselectAllItems);
 
             // Delegated keyboard listener for item cards
@@ -1925,26 +1928,37 @@
             function filterItems() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const itemCards = document.querySelectorAll('.item-card');
+                const noResults = document.getElementById('no-results');
+                let visibleCount = 0;
 
                 itemCards.forEach(card => {
                     const itemName = card.querySelector('h3').textContent.toLowerCase();
                     const itemDescription = card.querySelector('.text-xs.text-slate-400').textContent.toLowerCase();
-                    
+
                     const matches = itemName.includes(searchTerm) || itemDescription.includes(searchTerm);
-                    
+
                     if (matches) {
                         card.style.display = '';
+                        visibleCount++;
                     } else {
                         card.style.display = 'none';
                     }
                 });
+
+                if (noResults) {
+                    noResults.classList.toggle('hidden', visibleCount > 0);
+                }
             }
 
             function showAllItems() {
                 const itemCards = document.querySelectorAll('.item-card');
+                const noResults = document.getElementById('no-results');
                 itemCards.forEach(card => {
                     card.style.display = '';
                 });
+                if (noResults) {
+                    noResults.classList.add('hidden');
+                }
             }
 
             searchButton.addEventListener('click', filterItems);
