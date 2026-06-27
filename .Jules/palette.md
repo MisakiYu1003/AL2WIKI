@@ -5,3 +5,7 @@
 ## 2026-03-03 - Item Card Interaction Patterns
 **Learning:** Interactive elements implemented as `div` components (like item cards in `rich.html`) must include `tabindex="0"`, `role="button"`, and `aria-pressed` attributes. Keyboard support for 'Enter' and 'Space' should be delegated to the parent container, and focus-visible indicators must be explicitly styled to remain consistent with the accessibility patterns.
 **Action:** Use `setAttribute('aria-pressed', ...)` in JavaScript to toggle selection states and add `outline: 3px solid var(--rich-card-selected-border); outline-offset: 2px;` for custom focus indicators.
+
+## 2026-06-27 - Dynamic Feedback Accessibility
+**Learning:** For better screen reader accessibility, adding `aria-live="polite"` to 'no results' feedback elements ensures users are automatically notified when search filtering results in an empty state. This prevents the "silent failure" state where a screen reader user doesn't know why the content disappeared.
+**Action:** Always include `aria-live="polite"` on dynamically shown/hidden feedback elements like search 'no results' messages.
