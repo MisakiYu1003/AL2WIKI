@@ -19,7 +19,7 @@
   </p>
 
   <div class="filters">
-    <input id="kw" type="text" placeholder="關鍵字搜尋">
+    <input id="kw" type="text" placeholder="關鍵字搜尋 (按 / 搜尋)" aria-label="搜尋成就">
     <select id="cat"><option>全部</option></select>
     <select id="subcat"><option>全部</option></select>
     <select id="diff"><option>全部</option></select>
@@ -32,6 +32,9 @@
       <thead><tr id="theadRow"></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
+  </div>
+  <div id="no-results" class="text-center py-12 text-slate-400 hidden" style="text-align:center; padding: 20px;">
+    找不到符合的成就。
   </div>
 
   <details style="margin-top:8px">
@@ -78,6 +81,10 @@
     const k=kw.value.trim();if(k)data=data.filter(r=>["編號","名稱","稱號","說明","主類別","次類別"].some(x=>(r[x]||"").includes(k))||r._規則.some(x=>x.類別.includes(k)||x.參數.join(",").includes(k))||r._附加能力.some(x=>(x.種類||"").includes(k)));
     data.sort((a,b)=>{const va=a[sortKey],vb=b[sortKey];const na=+va,nb=+vb;let cmp;cmp=(!isNaN(na)&&!isNaN(nb))?na-nb:String(va||"").localeCompare(String(vb||""),"zh-Hant");return sortAsc?cmp:-cmp});
     stat.textContent=`已載入 ${rows.length} 筆；符合 ${data.length} 筆`;
+    const noResults = document.getElementById('no-results');
+    if (noResults) {
+      noResults.classList.toggle('hidden', data.length > 0);
+    }
     tbody.innerHTML="";
     data.forEach(r=>{const tr=document.createElement('tr');
       tr.innerHTML=`<td>${r["編號"]||""}</td><td>${r["主類別"]||""}</td><td>${r["次類別"]||""}</td><td><strong>${r["名稱"]||""}</strong></td><td class="muted">${r["稱號"]||"—"}</td><td>${r["難度"]||""}</td><td>${r["顯示"]||""}</td><td class="muted">${r["說明"]||""}</td><td data-cell="附加能力"></td><td data-cell="規則"></td>`;

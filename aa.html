@@ -44,14 +44,17 @@
     
     <div class="mb-8 max-w-lg mx-auto">
         <div class="flex">
-            <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋寵物或技能名稱..." style="color: black;">
-            <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2">搜尋</button>
-            <button id="clearButton" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-r-lg">清除</button>
+            <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋寵物或技能名稱... (按 / 搜尋)" aria-label="搜尋寵物或技能" style="color: black;">
+            <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2" aria-label="執行搜尋">搜尋</button>
+            <button id="clearButton" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-r-lg" aria-label="清除搜尋內容">清除</button>
         </div>
     </div>
 
     <div id="pet-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- 寵物資料將由 JavaScript 動態載入 -->
+    </div>
+    <div id="no-results" class="col-span-full text-center py-12 hidden">
+        <p class="text-xl text-gray-500">找不到符合的寵物或技能。</p>
     </div>
 </div>
 
@@ -6074,6 +6077,7 @@ document.addEventListener("DOMContentLoaded", () => {
         petCards.forEach(card => {
             card.style.display = '';
         });
+        document.getElementById('no-results').classList.add('hidden');
     }
 
     function filterPets() {
@@ -6083,6 +6087,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         const petCards = document.querySelectorAll('.pet-card');
+        let matchCount = 0;
 
         petCards.forEach(card => {
             const petName = card.querySelector('h2').textContent.toLowerCase();
@@ -6092,10 +6097,18 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (matches) {
                 card.style.display = '';
+                matchCount++;
             } else {
                 card.style.display = 'none';
             }
         });
+
+        const noResults = document.getElementById('no-results');
+        if (matchCount === 0) {
+            noResults.classList.remove('hidden');
+        } else {
+            noResults.classList.add('hidden');
+        }
     }
 
     searchButton.addEventListener('click', filterPets);
@@ -6108,6 +6121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearButton.addEventListener('click', () => {
         searchInput.value = '';
         showAllPets();
+        searchInput.focus();
     });
 });
 </script>
