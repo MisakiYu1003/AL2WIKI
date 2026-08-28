@@ -109,7 +109,7 @@
             <p>點擊物品卡片以加入或移出比較列表。(資料版本為2025/08/01遊戲市中活動擷取)</p>
             <div class="mt-4 max-w-lg mx-auto">
                 <div class="flex">
-                    <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋飾品名稱或敘述... (按 / 搜尋)" style="color: black;">
+                    <input type="text" id="searchInput" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none" placeholder="搜尋飾品名稱或敘述... (按 / 搜尋)" style="color: black;" aria-label="搜尋飾品">
                     <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2">搜尋</button>
                     <button id="clearButton" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-r-lg">清除</button>
                 </div>
@@ -119,6 +119,7 @@
         <main id="item-groups" class="space-y-12 pb-64">
             <!-- Item groups will be injected here by JavaScript -->
         </main>
+        <div id="no-results" class="text-center py-12 text-slate-400 hidden">找不到符合條件的飾品。</div>
 
         <footer id="comparison-container" class="fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 ease-in-out translate-y-full">
             <div class="comparison-area max-h-[50vh] overflow-y-auto">
@@ -1925,6 +1926,7 @@
             function filterItems() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const itemCards = document.querySelectorAll('.item-card');
+                let hasMatch = false;
 
                 itemCards.forEach(card => {
                     const itemName = card.querySelector('h3').textContent.toLowerCase();
@@ -1934,10 +1936,18 @@
                     
                     if (matches) {
                         card.style.display = '';
+                        hasMatch = true;
                     } else {
                         card.style.display = 'none';
                     }
                 });
+
+                const noResults = document.getElementById('no-results');
+                if (hasMatch) {
+                    noResults.classList.add('hidden');
+                } else {
+                    noResults.classList.remove('hidden');
+                }
             }
 
             function showAllItems() {
@@ -1945,6 +1955,7 @@
                 itemCards.forEach(card => {
                     card.style.display = '';
                 });
+                document.getElementById('no-results').classList.add('hidden');
             }
 
             searchButton.addEventListener('click', filterItems);

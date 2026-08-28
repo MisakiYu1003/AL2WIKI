@@ -19,7 +19,7 @@
   </p>
 
   <div class="filters">
-    <input id="kw" type="text" placeholder="關鍵字搜尋">
+    <input id="kw" type="text" placeholder="關鍵字搜尋 (按 / 搜尋)" aria-label="關鍵字搜尋">
     <select id="cat"><option>全部</option></select>
     <select id="subcat"><option>全部</option></select>
     <select id="diff"><option>全部</option></select>
@@ -79,10 +79,14 @@
     data.sort((a,b)=>{const va=a[sortKey],vb=b[sortKey];const na=+va,nb=+vb;let cmp;cmp=(!isNaN(na)&&!isNaN(nb))?na-nb:String(va||"").localeCompare(String(vb||""),"zh-Hant");return sortAsc?cmp:-cmp});
     stat.textContent=`已載入 ${rows.length} 筆；符合 ${data.length} 筆`;
     tbody.innerHTML="";
-    data.forEach(r=>{const tr=document.createElement('tr');
+    if(data.length === 0){
+      tbody.innerHTML = `<tr><td colspan="${columns.length}" style="text-align:center;padding:20px;color:var(--text-color);opacity:0.6;">找不到符合條件的成就。</td></tr>`;
+    } else {
+      data.forEach(r=>{const tr=document.createElement('tr');
       tr.innerHTML=`<td>${r["編號"]||""}</td><td>${r["主類別"]||""}</td><td>${r["次類別"]||""}</td><td><strong>${r["名稱"]||""}</strong></td><td class="muted">${r["稱號"]||"—"}</td><td>${r["難度"]||""}</td><td>${r["顯示"]||""}</td><td class="muted">${r["說明"]||""}</td><td data-cell="附加能力"></td><td data-cell="規則"></td>`;
       const bc=tr.querySelector('[data-cell="附加能力"]');if(r._附加能力.length && r._附加能力[0].種類){bc.textContent=r._附加能力.map(x=>(x.種類||"?")+" + "+(x.數值||0)).join("  ");}else bc.innerHTML='<span class="muted">—</span>';
       tbody.appendChild(tr)});
+    }
     function setOpts(sel,vals){const cur=sel.value;sel.innerHTML="<option>全部</option>"+vals.map(v=>`<option>${v}</option>`).join("");if([...sel.options].some(o=>o.value===cur))sel.value=cur}
     setOpts(cat,[...new Set(rows.map(r=>r["主類別"]).filter(Boolean))]);setOpts(subcat,[...new Set(rows.map(r=>r["次類別"]).filter(Boolean))]);setOpts(diff,[...new Set(rows.map(r=>r["難度"]).filter(Boolean))]);setOpts(visible,[...new Set(rows.map(r=>r["顯示"]).filter(Boolean))]);
   }
